@@ -165,7 +165,7 @@
   // Manejo de Inicio de Sesión de Admin
   if(sessionStorage.getItem('admin_auth') === 'ok') { mostrarAdmin(); }
   document.getElementById('btnLogin').addEventListener('click', () => {
-    if(document.getElementById('adminPass').value === 1226) {
+    if(document.getElementById('adminPass').value === "1226") {
       sessionStorage.setItem('admin_auth', 'ok');
       mostrarAdmin();
     } else {
