@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Estudiante – Aula Virtual Premium</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    /* Estilos Modernos Coherentes con el Panel del Profesor */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: #1f2937;
+      margin: 0;
+      padding: 0;
+    }
+
+    .app-layout {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #f9fafb;
+      min-height: 100vh;
+      box-shadow: 0 0 40px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .app-header {
+      background: white;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .back-link {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s;
+    }
+    .back-link:hover { transform: translateX(-3px); }
+    .app-header h1 { font-size: 1.2rem; font-weight: 700; margin: 0; color: #111827; }
+
+    .badge-student {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #d1d5db;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-dot.online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+
+    /* Alerta flotante de nueva tarea */
+    .new-post-alert {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+      z-index: 45;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .new-post-alert.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+
+    /* Feed y Listado de Asignaciones */
+    .feed-area {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .post-card {
+      background: white;
+      border-radius: 18px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid #f3f4f6;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+    }
+    .post-meta .author { font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.4rem; }
+    .post-meta .time { color: #9ca3af; }
+
+    .new-badge {
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.1rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+    }
+
+    .post-text { font-size: 0.98rem; line-height: 1.5; color: #4b5563; margin: 0 0 1rem 0; white-space: pre-wrap; }
+
+    /* Descarga de archivos adjuntos */
+    .file-attach-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f3f4f6;
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+      border: 1px solid #e5e7eb;
+    }
+    .file-attach-link:hover { background: #e0e7ff; border-color: #c7d2fe; }
+
+    /* Pantallas de carga y estados vacíos */
+    .waiting-screen, .empty-feed {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: #6b7280;
+    }
+    .big-icon { font-size: 3.5rem; color: #d1d5db; margin-bottom: 1rem; }
+    .pulse { animation: alertPulse 2s infinite; }
+    @keyframes alertPulse {
+      0% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.7; }
+    }
+
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 5rem;
+      color: #6b7280;
+    }
+    .spinner {
+      width: 35px;
+      height: 35px;
+      border: 4px solid rgba(79, 70, 229, 0.1);
+      border-left-color: #4f46e5;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <header class="app-header">
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+    <h1>Mi Clase</h1>
+    <span class="badge-student">Estudiante</span>
+    <div class="status-indicator" id="statusIndicator">
+      <span class="status-dot" id="dot"></span><span id="statusText">Conectando...</span>
+    </div>
+  </header>
+
+  <div class="new-post-alert" id="newAlert">
+    <i class="fa-solid fa-bell-ring fa-bounce"></i> Nueva tarea publicada por el Profesor
+  </div>
+
+  <main class="feed-area" id="feed">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <span>Conectando al aula...</span>
+    </div>
+  </main>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, orderBy, query, limit }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBynAiyunaie-L49lT_mJ3W7SiQRB9sDVw",
+    authDomain: "clases-68cf1.firebaseapp.com",
+    projectId: "clases-68cf1",
+    storageBucket: "clases-68cf1.firebasestorage.app",
+    messagingSenderId: "734322078138",
+    appId: "1:734322078138:web:66ddaaab8b05ffe1996d83"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  const feed      = document.getElementById('feed');
+  const statusText = document.getElementById('statusText');
+  const dot       = document.getElementById('dot');
+  const newAlert  = document.getElementById('newAlert');
+
+  let isFirstLoad = true;
+  let knownIds = new Set();
+
+  newAlert.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    newAlert.classList.remove('visible');
+  });
+
+  const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
+
+  onSnapshot(q, (snapshot) => {
+    dot.className = "status-dot online";
+    statusText.textContent = "En línea";
+
+    if (snapshot.empty) {
+      feed.innerHTML = `
+        <div class="waiting-screen">
+          <div class="big-icon pulse"><i class="fa-regular fa-clock"></i></div>
+          <p style="font-weight: 500; font-size: 1.1rem; color: #4b5563;">Tu pizarra está limpia</p>
+          <p style="margin-top:0.25rem; font-size:0.9rem; color: #9ca3af;">Esperando las asignaciones del profesor...</p>
+        </div>`;
+      isFirstLoad = false;
+      return;
+    }
+
+    const newIds = new Set(snapshot.docs.map(d => d.id));
+    let hayNuevas = false;
+    if (!isFirstLoad) {
+      newIds.forEach(id => { if (!knownIds.has(id)) hayNuevas = true; });
+    }
+    knownIds = newIds;
+
+    feed.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const time = d.timestamp?.toDate
+        ? d.timestamp.toDate().toLocaleString('es', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
+        : 'Ahora';
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      
+      let linkHtml = "";
+      if (d.archivoUrl) {
+        linkHtml = `<a href="${d.archivoUrl}" target="_blank" class="file-attach-link"><i class="fa-solid fa-file-arrow-down"></i> Descargar Recurso</a>`;
+      }
+
+      card.innerHTML = `
+        <div class="post-meta">
+          <span class="author"><i class="fa-solid fa-user-tie"></i> ${d.autor || 'Profesor'} ${hayNuevas && !isFirstLoad ? '<span class="new-badge">Nuevo</span>' : ''}</span>
+          <span class="time"><i class="fa-regular fa-clock"></i> ${time}</span>
+        </div>
+        <p class="post-text">${escapeHTML(d.texto)}</p>
+        ${linkHtml}
+      `;
+      feed.appendChild(card);
+    });
+
+    if (hayNuevas && window.scrollY > 100) {
+      newAlert.classList.add('visible');
+      setTimeout(() => newAlert.classList.remove('visible'), 6000);
+    }
+
+    isFirstLoad = false;
+
+  }, () => {
+    dot.className = "status-dot";
+    statusText.textContent = "Sin conexión";
+    feed.innerHTML = `<div class="empty-feed"><div class="empty-icon"><i class="fa-solid fa-satellite-dish"></i></div><p>Sin conexión. Verifica tu acceso a internet.</p></div>`;
+  });
+
+  function escapeHTML(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
