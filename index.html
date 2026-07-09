@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aula Virtual – Acceso Principal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; color: #1f2937; margin: 0; padding: 0; }
+    
+    /* Pantalla de Selección de Rol Inicial */
+    .role-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem;
+    }
+    .role-box {
+      background: rgba(255, 255, 255, 0.98); border-radius: 28px; padding: 3rem 2rem;
+      width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .role-box h2 { font-size: 1.8rem; color: #1e1b4b; margin-bottom: 0.5rem; font-weight: 700; }
+    .role-box p { color: #6b7280; font-size: 0.95rem; margin-bottom: 2.5rem; }
+    
+    .role-options { display: flex; flex-direction: column; gap: 1.2rem; }
+    .role-btn {
+      display: flex; align-items: center; gap: 1rem; padding: 1.2rem;
+      border: 2px solid #e5e7eb; border-radius: 16px; background: white;
+      cursor: pointer; text-align: left; transition: all 0.3s ease;
+    }
+    .role-btn:hover {
+      border-color: #4f46e5; background: #f5f3ff; transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1);
+    }
+    .role-btn i { font-size: 2rem; }
+    .role-btn.student-opt i { color: #3b82f6; }
+    .role-btn.teacher-opt i { color: #7c3aed; }
+    .role-btn .btn-text h3 { margin: 0; font-size: 1.1rem; color: #1f2937; font-weight: 600; }
+    .role-btn .btn-text p { margin: 0; font-size: 0.85rem; color: #6b7280; }
+
+    /* BOTÓN SECRETO PARA EL ADMIN */
+    .admin-secret-link {
+      display: inline-block; margin-top: 2rem; color: #d1d5db; 
+      text-decoration: none; font-size: 0.8rem; transition: color 0.3s;
+      cursor: pointer;
+    }
+    .admin-secret-link:hover { color: #9ca3af; }
+
+    /* Pantalla de Registro de Alumno */
+    .register-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      display: none; align-items: center; justify-content: center; z-index: 999; padding: 1.5rem;
+    }
+    .register-box {
+      background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 2.5rem 2rem;
+      width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .register-box i { font-size: 3rem; color: #3b82f6; margin-bottom: 1rem; }
+    .register-box h2 { font-size: 1.5rem; color: #1e3a8a; margin-bottom: 0.5rem; }
+    .register-box p { color: #6b7280; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    
+    .register-box input, .register-box select {
+      width: 100%; box-sizing: border-box; background: #f9fafb; border: 2px solid #e5e7eb;
+      border-radius: 12px; padding: 0.8rem; font-family: 'Poppins', sans-serif; font-size: 1rem;
+      outline: none; margin-bottom: 1rem; transition: all 0.3s; color: #1f2937;
+    }
+    .register-box input:focus, .register-box select:focus { border-color: #3b82f6; background: white; }
+    
+    .btn-enter {
+      width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white; border: none; border-radius: 12px; padding: 0.9rem;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-enter:hover { transform: translateY(-2px); }
+    .btn-back { display: block; margin-top: 1rem; color: #6b7280; text-decoration: none; font-size: 0.85rem; cursor: pointer; }
+
+    /* Layout Principal App Estudiante */
+    .app-layout { max-width: 600px; margin: 0 auto; background: #f9fafb; min-height: 100vh; display: none; flex-direction: column; }
+    .app-header { background: white; padding: 1.25rem; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .app-header h1 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+    .badge-student { background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
+    
+    /* Feed Area */
+    .feed-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+    .post-card { background: white; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
+    .post-meta { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; }
+    .post-meta .author { font-weight: 600; color: #374151; }
+    .post-meta .time { color: #9ca3af; }
+    .post-text { font-size: 0.98rem; line-height: 1.5; color: #4b5563; margin: 0 0 0.75rem 0; white-space: pre-wrap; }
+    
+    .file-attach-link { display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.85rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
+    .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; color: #6b7280; }
+    .spinner { width: 35px; height: 35px; border: 4px solid rgba(59, 130, 246, 0.1); border-left-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-feed { text-align: center; padding: 4rem; color: #9ca3af; }
+  </style>
+</head>
+<body>
+
+<div class="role-screen" id="roleScreen">
+  <div class="role-box">
+    <h2>¡Bienvenido al Aula Virtual!</h2>
+    <p>Por favor, selecciona tu rol para ingresar al portal</p>
+    
+    <div class="role-options">
+      <button class="role-btn student-opt" id="chooseStudent">
+        <i class="fa-solid fa-user-graduate"></i>
+        <div class="btn-text">
+          <h3>Soy Estudiante</h3>
+          <p>Ver mis tareas, comunicados y descargar materiales</p>
+        </div>
+      </button>
+
+      <button class="role-btn teacher-opt" id="chooseTeacher">
+        <i class="fa-solid fa-user-tie"></i>
+        <div class="btn-text">
+          <h3>Soy Profesor</h3>
+          <p>Subir asignaciones, adjuntar archivos y panel de control</p>
+        </div>
+      </button>
+    </div>
+
+    <a href="admin.html" class="admin-secret-link"><i class="fa-solid fa-gear"></i> Panel de Control</a>
+  </div>
+</div>
+
+<div class="register-screen" id="registerScreen">
+  <div class="register-box">
+    <i class="fa-solid fa-graduation-cap"></i>
+    <h2>Identificación de Alumno</h2>
+    <p>Ingresa tus datos reales para pasar asistencia</p>
+    
+    <input type="text" id="studentName" placeholder="Nombre y Apellido completo" autocomplete="off" />
+    
+    <select id="studentCourse">
+      <option value="" disabled selected>Selecciona tu Curso</option>
+      <option value="1er Grado">1er Grado</option>
+      <option value="2do Grado">2do Grado</option>
+      <option value="3er Grado">3er Grado</option>
+      <option value="4to Grado">4to Grado</option>
+      <option value="5to Grado">5to Grado</option>
+      <option value="6to Grado">6to Grado</option>
+    </select>
+    
+    <input type="number" id="studentList" placeholder="Número de Lista" min="1" max="50" autocomplete="off" />
+    
+    <button class="btn-enter" id="btnEnter">Ingresar al Aula</button>
+    <span class="btn-back" id="backToRoles"><i class="fa-solid fa-arrow-left"></i> Volver atrás</span>
+  </div>
+</div>
+
+<div class="app-layout" id="appContent">
+  <header class="app-header">
+    <div>
+      <h1 id="welcomeText">Cargando...</h1>
+      <span id="studentMeta" style="font-size:0.8rem; color:#6b7280;"></span>
+    </div>
+    <span class="badge-student">Estudiante</span>
+  </header>
+
+  <main class="feed-area" id="feed">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <span>Cargando tareas asignadas...</span>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, orderBy, query, limit, doc, setDoc, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBynAiyunaie-L49lT_mJ3W7SiQRB9sDVw",
+    authDomain: "clases-68cf1.firebaseapp.com",
+    projectId: "clases-68cf1",
+    storageBucket: "clases-68cf1.firebasestorage.app",
+    messagingSenderId: "734322078138",
+    appId: "1:734322078138:web:66ddaaab8b05ffe1996d83"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  let userIdLog = ""; 
+  let asistenciaIdLog = "";
+
+  document.getElementById('chooseTeacher').addEventListener('click', () => {
+    window.location.href = "profesor.html";
+  });
+
+  document.getElementById('chooseStudent').addEventListener('click', () => {
+    document.getElementById('roleScreen').style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'flex';
+  });
+
+  document.getElementById('backToRoles').addEventListener('click', () => {
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('roleScreen').style.display = 'flex';
+  });
+
+  document.getElementById('btnEnter').addEventListener('click', async () => {
+    const nombre = document.getElementById('studentName').value.trim();
+    const curso  = document.getElementById('studentCourse').value;
+    const lista  = document.getElementById('studentList').value.trim();
+
+    if(!nombre || !curso || !lista) {
+      alert("⚠️ Por favor, llena todos tus campos obligatorios para ingresar.");
+      return;
+    }
+
+    userIdLog = `alumno_${lista}_${nombre.replace(/\s+/g, '_')}`;
+    asistenciaIdLog = `asist_${Date.now()}_${lista}`;
+
+    await setDoc(doc(db, 'usuarios', userIdLog), { nombre, rol: 'alumno', curso, numLista: lista, estado: 'online' }, { merge: true });
+    await setDoc(doc(db, 'asistencia', asistenciaIdLog), { nombre, rol: 'alumno', curso, numLista: lista, entrada: serverTimestamp(), salida: null });
+
+    localStorage.setItem('user_log_id', userIdLog);
+    localStorage.setItem('asist_log_id', asistenciaIdLog);
+
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'flex';
+    document.getElementById('welcomeText').textContent = `Hola, ${nombre.split(' ')[0]} 👋`;
+    document.getElementById('studentMeta').textContent = `${curso} | N° Lista: ${lista}`;
+
+    iniciarFeedAlumnos();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    const uId = userIdLog || localStorage.getItem('user_log_id');
+    const aId = asistenciaIdLog || localStorage.getItem('asist_log_id');
+    if(uId && aId) {
+      setDoc(doc(db, 'usuarios', uId), { estado: 'offline' }, { merge: true });
+      setDoc(doc(db, 'asistencia', aId), { salida: serverTimestamp() }, { merge: true });
+    }
+  });
+
+  function iniciarFeedAlumnos() {
+    const feed = document.getElementById('feed');
+    const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
+    
+    onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) {
+        feed.innerHTML = `<div class="empty-feed"><p>📚 No hay asignaciones publicadas por el profesor todavía.</p></div>`;
+        return;
+      }
+      feed.innerHTML = '';
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const time = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) : 'Ahora';
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        let linkHtml = d.archivoUrl ? `<img src="${d.archivoUrl}" style="width:100%; border-radius:12px; margin-top:8px;"/>` : "";
+        card.innerHTML = `<div class="post-meta"><span class="author"><i class="fa-solid fa-user-tie"></i> ${d.autor}</span><span class="time"><i class="fa-regular fa-clock"></i> ${time}</span></div><p class="post-text">${escapeHTML(d.texto)}</p>${linkHtml}`;
+        feed.appendChild(card);
+      });
+    });
+  }
+
+  function escapeHTML(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
