@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Estudiante – Aula Virtual Premium</title>
-  
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
@@ -93,9 +93,9 @@
       position: sticky;
       top: 69px;
       z-index: 48;
-      scrollbar-width: none; /* Oculta scroll en Firefox */
+      scrollbar-width: none;
     }
-    .filter-container::-webkit-scrollbar { display: none; } /* Oculta scroll en Chrome */
+    .filter-container::-webkit-scrollbar { display: none; }
 
     .filter-btn {
       background: #f3f4f6;
@@ -317,8 +317,14 @@
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
 
+  // SOLICITAR PERMISO DE NOTIFICACIONES AL NAVEGADOR
+  if ("Notification" in window) {
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
+  }
+
   newAlert.addEventListener('click', () => {
-    // Al hacer clic, quita filtros, muestra todo y sube
     materiaSeleccionada = "Todos";
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-materia="Todos"]').classList.add('active');
@@ -327,7 +333,6 @@
     newAlert.classList.remove('visible');
   });
 
-  // Manejo de clicks en los botones de filtro
   filterContainer.addEventListener('click', (e) => {
     if (!e.target.classList.contains('filter-btn')) return;
     
@@ -356,33 +361,42 @@
       return;
     }
 
-    // Detectar si hay publicaciones realmente nuevas
     const currentDocs = snapshot.docs;
     let hayNuevas = false;
     let ultimaMateriaNueva = "Generales";
+    let textoCortoNuevo = "";
 
     if (!isFirstLoad) {
       for (let doc of currentDocs) {
         if (!knownIds.has(doc.id)) {
           hayNuevas = true;
           ultimaMateriaNueva = doc.data().materia || "Generales";
+          textoCortoNuevo = doc.data().texto || "";
           break; 
         }
       }
     }
 
-    // Actualizar base de IDs conocidos
     knownIds = new Set(currentDocs.map(d => d.id));
     todasLasPublicaciones = currentDocs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Pintar los posts aplicando el filtro actual
     renderFeed(hayNuevas);
 
-    // Si hay una tarea nueva de una materia, lanzar la alerta flotante personalizada
-    if (hayNuevas && window.scrollY > 100) {
-      alertText.textContent = `Nueva tarea en: ${ultimaMateriaNueva}`;
-      newAlert.classList.add('visible');
-      setTimeout(() => newAlert.classList.remove('visible'), 7000);
+    // DISPARAR NOTIFICACIONES SI LLEGA ALGO NUEVO
+    if (hayNuevas) {
+      if (window.scrollY > 100) {
+        alertText.textContent = `Nueva tarea en: ${ultimaMateriaNueva}`;
+        newAlert.classList.add('visible');
+        setTimeout(() => newAlert.classList.remove('visible'), 7000);
+      }
+
+      // Notificación nativa si la ventana no está visible en ese momento
+      if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+        new Notification(`📢 Nueva tarea: ${ultimaMateriaNueva}`, {
+          body: textoCortoNuevo.substring(0, 60) + "...",
+          icon: "icons/icon-192.png"
+        });
+      }
     }
 
     isFirstLoad = false;
@@ -393,9 +407,7 @@
     feed.innerHTML = `<div class="empty-feed"><div class="empty-icon"><i class="fa-solid fa-satellite-dish"></i></div><p>Sin conexión. Verifica tu acceso a internet.</p></div>`;
   });
 
-  // Función encargada de dibujar los posts en pantalla dependiendo del filtro
   function renderFeed(resaltarNuevas = false) {
-    // Filtrar array completo
     const publicacionesFiltradas = todasLasPublicaciones.filter(p => {
       if (materiaSeleccionada === "Todos") return true;
       const tag = p.materia || "Generales";
