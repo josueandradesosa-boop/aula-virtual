@@ -47,9 +47,13 @@
     .badge-teacher { background: #e0e7ff; color: #4f46e5; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
 
     /* Feed de publicaciones */
-    .feed-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; padding-bottom: 280px; }
+    .feed-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; padding-bottom: 340px; }
     .post-card { background: white; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #f3f4f6; }
-    .post-meta { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; color: #6b7280; }
+    .post-meta { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; color: #6b7280; align-items: center; }
+    
+    /* Etiqueta colorida de la Materia */
+    .subject-badge { background: #4f46e5; color: white; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    
     .post-text { font-size: 0.98rem; line-height: 1.5; color: #374151; margin-bottom: 0.75rem; white-space: pre-wrap; }
     
     /* Imagen dentro del post */
@@ -58,7 +62,14 @@
     /* Creador de Tareas Fijo Inferior */
     .composer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: white; box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1); border-top: 1px solid #e5e7eb; padding: 1.2rem; box-sizing: border-box; border-radius: 24px 24px 0 0; z-index: 40; }
     
-    /* CAMBIO CRÍTICO: Forzar fondo blanco puro y letras negro oscuro al escribir */
+    /* Estilos del Selector de Materias */
+    .subject-select {
+      width: 100%; box-sizing: border-box; padding: 0.6rem; border: 2px solid #e5e7eb;
+      border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.95rem;
+      margin-bottom: 0.75rem; color: #1f2937; background-color: #f9fafb; outline: none;
+    }
+    .subject-select:focus { border-color: #4f46e5; background-color: white; }
+
     .composer textarea { 
       width: 100%; box-sizing: border-box; height: 80px; 
       border: 2px solid #e5e7eb; border-radius: 12px; padding: 0.75rem; 
@@ -108,6 +119,19 @@
   </main>
 
   <div class="composer">
+    <select id="subjectSelect" class="subject-select">
+      <option value="Generales">Materia: Avisos Generales</option>
+      <option value="Matemáticas">📐 Matemáticas</option>
+      <option value="Lengua Española">📚 Lengua Española</option>
+      <option value="Ciencias Sociales">🌍 Ciencias Sociales</option>
+      <option value="Ciencias Naturales">🌱 Ciencias Naturales</option>
+      <option value="Cívica">⚖️ Cívica y Formación Humana</option>
+      <option value="Informática">💻 Informática</option>
+      <option value="Artística">🎨 Artística</option>
+      <option value="Inglés">🗣️ Inglés</option>
+      <option value="Francés">🥖 Francés</option>
+    </select>
+
     <textarea id="msgInput" placeholder="Escribe la tarea o un anuncio aquí..." maxlength="2000" style="color: #000000 !important; background: #ffffff !important;"></textarea>
     
     <div class="preview-box" id="previewBox">
@@ -199,6 +223,7 @@
   function iniciarFirebase() {
     const feed = document.getElementById('feed');
     const msgInput = document.getElementById('msgInput');
+    const subjectSelect = document.getElementById('subjectSelect');
     const publishBtn = document.getElementById('publishBtn');
     const toast = document.getElementById('toast');
     const fileInput = document.getElementById('fileInput');
@@ -211,7 +236,6 @@
     fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0]; if (!file) return;
 
-      // Mostrar contenedor de vista previa local inmediatamente
       previewBox.style.display = "flex";
       imgPreview.src = URL.createObjectURL(file);
       uploadStatus.textContent = "📤 Subiendo foto...";
@@ -236,23 +260,31 @@
       }
     });
 
-    // Publicar Tarea
+    // Publicar Tarea con Materia Incluida
     publishBtn.addEventListener('click', async () => {
       const text = msgInput.value.trim();
+      const materia = subjectSelect.value;
       if (!text && !urlArchivoAdjunto) { showToast('Escribe algo o sube una foto primero'); return; }
       
       publishBtn.disabled = true;
       
       try {
-        await addDoc(collection(db, 'publicaciones'), { texto: text, autor: 'Profesor', archivoUrl: urlArchivoAdjunto, timestamp: serverTimestamp() });
+        await addDoc(collection(db, 'publicaciones'), { 
+          texto: text, 
+          autor: 'Profesor', 
+          materia: materia, // Guarda la materia en Firebase
+          archivoUrl: urlArchivoAdjunto, 
+          timestamp: serverTimestamp() 
+        });
         msgInput.value = ''; urlArchivoAdjunto = ""; previewBox.style.display = "none";
         uploadLabelText.textContent = "Subir Foto"; fileInput.value = "";
-        showToast('✅ Publicado con éxito!');
+        subjectSelect.value = "Generales"; // Resetea a Avisos Generales
+        showToast('✅ ¡Publicado con éxito!');
       } catch (err) { showToast('Error al publicar'); }
       finally { publishBtn.disabled = false; }
     });
 
-    // Feed en tiempo real con render de imagen directo
+    // Feed en tiempo real con renderizado de materias
     const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
     onSnapshot(q, (snapshot) => {
       if (snapshot.empty) {
@@ -264,10 +296,20 @@
         const time = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) : 'Ahora';
         const card = document.createElement('div'); card.className = 'post-card';
         
-        // Si hay link de archivo/foto, lo pintamos directo como una imagen visible
         let mediaHtml = d.archivoUrl ? `<img src="${d.archivoUrl}" class="post-img" alt="Material" onclick="window.open('${d.archivoUrl}', '_blank')"/>` : "";
         
-        card.innerHTML = `<div class="post-meta"><span><i class="fa-solid fa-user-tie"></i> ${d.autor}</span><span><i class="fa-regular fa-clock"></i> ${time}</span></div><p class="post-text">${escapeHTML(d.texto)}</p>${mediaHtml}`;
+        // Pone la etiqueta de la materia si existe, si no, por defecto es 'Generales'
+        const tagMateria = d.materia ? d.materia : 'Generales';
+        
+        card.innerHTML = `
+          <div class="post-meta">
+            <span><i class="fa-solid fa-user-tie"></i> ${d.autor}</span>
+            <span class="subject-badge">${tagMateria}</span>
+            <span><i class="fa-regular fa-clock"></i> ${time}</span>
+          </div>
+          <p class="post-text">${escapeHTML(d.texto)}</p>
+          ${mediaHtml}
+        `;
         feed.appendChild(card);
       });
     });
