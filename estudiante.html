@@ -14,230 +14,167 @@
 
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f3f4f6;
-      color: #1f2937;
-      margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif !important;
+      background-color: #f3f4f6 !important;
+      color: #1f2937 !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     .app-layout {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #f9fafb;
-      min-height: 100vh;
-      box-shadow: 0 0 40px rgba(0,0,0,0.05);
-      position: relative;
+      max-width: 600px !important;
+      margin: 0 auto !important;
+      background: #f9fafb !important;
+      min-height: 100vh !important;
+      box-shadow: 0 0 40px rgba(0,0,0,0.05) !important;
+      position: relative !important;
+      display: block !important;
     }
 
     .app-header {
-      background: white;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      background: white !important;
+      padding: 1.25rem 1.5rem !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 2000 !important;
     }
 
     .back-link {
-      color: #4f46e5;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: transform 0.2s;
+      color: #4f46e5 !important;
+      text-decoration: none !important;
+      font-weight: 500 !important;
+      font-size: 0.95rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
     }
-    .back-link:hover { transform: translateX(-3px); }
-    .app-header h1 { font-size: 1.2rem; font-weight: 700; margin: 0; color: #111827; }
+    
+    .app-header h1 { font-size: 1.2rem !important; font-weight: 700 !important; margin: 0 !important; color: #111827 !important; display: block !important; }
 
     .badge-student {
-      background: #d1fae5;
-      color: #065f46;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      background: #d1fae5 !important;
+      color: #065f46 !important;
+      padding: 0.25rem 0.75rem !important;
+      border-radius: 9999px !important;
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      display: inline-block !important;
     }
 
     .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      color: #6b7280;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.4rem !important;
+      font-size: 0.8rem !important;
+      color: #6b7280 !important;
     }
     .status-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #d1d5db;
-      border-radius: 50%;
-      display: inline-block;
+      width: 8px !important;
+      height: 8px !important;
+      background-color: #d1d5db !important;
+      border-radius: 50% !important;
+      display: inline-block !important;
     }
-    .status-dot.online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+    .status-dot.online { background-color: #10b981 !important; box-shadow: 0 0 8px #10b981 !important; }
 
+    /* Forzar visibilidad de la barra de materias */
     .filter-container {
-      background: white;
-      padding: 0.75rem 1rem;
-      display: flex;
-      gap: 0.6rem;
-      overflow-x: auto;
-      white-space: nowrap;
-      border-bottom: 1px solid #e5e7eb;
-      position: sticky;
-      top: 69px;
-      z-index: 48;
-      scrollbar-width: none;
+      background: white !important;
+      padding: 0.75rem 1rem !important;
+      display: flex !important;
+      gap: 0.6rem !important;
+      overflow-x: auto !important;
+      white-space: nowrap !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      position: sticky !important;
+      top: 65px !important;
+      z-index: 1900 !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      scrollbar-width: none !important;
     }
-    .filter-container::-webkit-scrollbar { display: none; }
+    .filter-container::-webkit-scrollbar { display: none !important; }
 
     .filter-btn {
-      background: #f3f4f6;
-      color: #4b5563;
-      border: none;
-      padding: 0.4rem 1rem;
-      border-radius: 9999px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background: #f3f4f6 !important;
+      color: #4b5563 !important;
+      border: none !important;
+      padding: 0.4rem 1rem !important;
+      border-radius: 9999px !important;
+      font-family: 'Poppins', sans-serif !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      display: inline-block !important;
+      transition: all 0.2s ease !important;
     }
     .filter-btn.active {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      color: white;
-      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+      color: white !important;
     }
 
     .new-post-alert {
-      position: fixed;
-      top: 140px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
-      z-index: 45;
+      position: fixed !important;
+      top: 140px !important;
+      left: 50% !important;
+      transform: translateX(-50%) translateY(-20px) !important;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      color: white !important;
+      padding: 0.6rem 1.2rem !important;
+      border-radius: 30px !important;
+      font-size: 0.85rem !important;
+      font-weight: 600 !important;
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3) !important;
+      z-index: 1800 !important;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      transition: all 0.3s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
     }
-    .new-post-alert.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    .new-post-alert.visible { opacity: 1 !important; pointer-events: auto !important; transform: translateX(-50%) translateY(0) !important; }
 
     .feed-area {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
+      padding: 1.5rem !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1.2rem !important;
     }
 
     .post-card {
-      background: white;
-      border-radius: 18px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-      border: 1px solid #f3f4f6;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .post-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      background: white !important;
+      border-radius: 18px !important;
+      padding: 1.5rem !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid #f3f4f6 !important;
+      margin-bottom: 1rem !important;
     }
 
     .post-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-      font-size: 0.85rem;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      margin-bottom: 0.75rem !important;
     }
-    .post-meta .author { font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.4rem; }
-    .post-meta .time { color: #9ca3af; }
-
+    .post-meta .author { font-weight: 600 !important; color: #374151 !important; display: flex !important; align-items: center !important; gap: 0.4rem !important; }
+    
     .subject-badge {
-      background: #e0e7ff;
-      color: #4f46e5;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      background: #e0e7ff !important;
+      color: #4f46e5 !important;
+      padding: 0.2rem 0.6rem !important;
+      border-radius: 6px !important;
+      font-size: 0.75rem !important;
+      font-weight: 600 !important;
     }
 
-    .new-badge {
-      background: #fef3c7;
-      color: #92400e;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.1rem 0.5rem;
-      border-radius: 4px;
-      margin-left: 0.5rem;
-    }
-
-    .post-text { font-size: 0.98rem; line-height: 1.5; color: #4b5563; margin: 0 0 1rem 0; white-space: pre-wrap; }
-
-    .file-attach-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #f3f4f6;
-      padding: 0.6rem 1.2rem;
-      border-radius: 12px;
-      font-size: 0.88rem;
-      color: #4f46e5;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.2s;
-      border: 1px solid #e5e7eb;
-    }
-    .file-attach-link:hover { background: #e0e7ff; border-color: #c7d2fe; }
-
-    .post-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e5e7eb; cursor: pointer; }
-
-    .waiting-screen, .empty-feed {
-      text-align: center;
-      padding: 5rem 2rem;
-      color: #6b7280;
-    }
-    .big-icon { font-size: 3.5rem; color: #d1d5db; margin-bottom: 1rem; }
-    .pulse { animation: alertPulse 2s infinite; }
-    @keyframes alertPulse {
-      0% { transform: scale(1); opacity: 0.7; }
-      50% { transform: scale(1.08); opacity: 1; }
-      100% { transform: scale(1); opacity: 0.7; }
-    }
-
-    .loading-spinner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      padding: 5rem;
-      color: #6b7280;
-    }
-    .spinner {
-      width: 35px;
-      height: 35px;
-      border: 4px solid rgba(79, 70, 229, 0.1);
-      border-left-color: #4f46e5;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .post-text { font-size: 0.98rem !important; line-height: 1.5 !important; color: #4b5563 !important; margin: 0 0 1rem 0 !important; white-space: pre-wrap !important; }
+    .post-img { width: 100% !important; max-height: 300px !important; object-fit: cover !important; border-radius: 12px !important; }
+    .file-attach-link { display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; color: #4f46e5 !important; font-weight: 500 !important; text-decoration: none !important; }
   </style>
 </head>
 <body>
@@ -273,7 +210,6 @@
 
   <main class="feed-area" id="feed">
     <div class="loading-spinner">
-      <div class="spinner"></div>
       <span>Conectando al aula...</span>
     </div>
   </main>
@@ -309,6 +245,7 @@
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
 
+  // Pedir permisos nativos de notificación
   if ("Notification" in window) {
     if (Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission();
@@ -339,12 +276,7 @@
     statusText.textContent = "En línea";
 
     if (snapshot.empty) {
-      feed.innerHTML = `
-        <div class="waiting-screen">
-          <div class="big-icon pulse"><i class="fa-regular fa-clock"></i></div>
-          <p style="font-weight: 500; font-size: 1.1rem; color: #4b5563;">Tu pizarra está limpia</p>
-          <p style="margin-top:0.25rem; font-size:0.9rem; color: #9ca3af;">Esperando las asignaciones del profesor...</p>
-        </div>`;
+      feed.innerHTML = `<p style="text-align:center;padding:2rem;">No hay tareas vigentes.</p>`;
       isFirstLoad = false;
       todasLasPublicaciones = [];
       return;
@@ -389,46 +321,34 @@
     isFirstLoad = false;
 
   }, () => {
-    dot.className = "status-dot";
     statusText.textContent = "Sin conexión";
-    feed.innerHTML = `<div class="empty-feed"><div class="empty-icon"><i class="fa-solid fa-satellite-dish"></i></div><p>Sin conexión. Verifica tu acceso a internet.</p></div>`;
   });
 
   function renderFeed(resaltarNuevas = false) {
     const publicacionesFiltradas = todasLasPublicaciones.filter(p => {
       if (materiaSeleccionada === "Todos") return true;
-      const tag = p.materia || "Generales";
-      return tag === materiaSeleccionada;
+      return (p.materia || "Generales") === materiaSeleccionada;
     });
 
     if (publicacionesFiltradas.length === 0) {
-      feed.innerHTML = `
-        <div class="waiting-screen">
-          <div class="big-icon"><i class="fa-solid fa-folder-open"></i></div>
-          <p style="font-weight: 500; font-size: 1rem; color: #6b7280;">Sin publicaciones de ${materiaSeleccionada}</p>
-        </div>`;
+      feed.innerHTML = `<p style="text-align:center;padding:2rem;color:#6b7280;">Sin publicaciones de ${materiaSeleccionada}</p>`;
       return;
     }
 
     feed.innerHTML = '';
     publicacionesFiltradas.forEach(p => {
-      const time = p.timestamp?.toDate
-        ? p.timestamp.toDate().toLocaleString('es', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
-        : 'Ahora';
-
+      const time = p.timestamp?.toDate ? p.timestamp.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'}) : 'Ahora';
       const card = document.createElement('div');
       card.className = 'post-card';
       
       let mediaHtml = p.archivoUrl ? `<img src="${p.archivoUrl}" class="post-img" alt="Material" onclick="window.open('${p.archivoUrl}', '_blank')"/>` : "";
-      let linkHtml = p.archivoUrl ? `<a href="${p.archivoUrl}" target="_blank" class="file-attach-link"><i class="fa-solid fa-file-arrow-down"></i> Descargar Recurso</a>` : "";
-
-      const tagMateria = p.materia || 'Generales';
+      let linkHtml = p.archivoUrl ? `<a href="${p.archivoUrl}" target="_blank" class="file-attach-link"><i class="fa-solid fa-file-arrow-down"></i> Descargar Archivo</a>` : "";
 
       card.innerHTML = `
         <div class="post-meta">
-          <span class="author"><i class="fa-solid fa-user-tie"></i> ${p.autor || 'Profesor'} ${resaltarNuevas && isFirstLoad === false ? '<span class="new-badge">Nuevo</span>' : ''}</span>
-          <span class="subject-badge">${tagMateria}</span>
-          <span class="time"><i class="fa-regular fa-clock"></i> ${time}</span>
+          <span class="author"><i class="fa-solid fa-user-tie"></i> ${p.autor || 'Profesor'}</span>
+          <span class="subject-badge">${p.materia || 'Generales'}</span>
+          <span class="time">${time}</span>
         </div>
         <p class="post-text">${escapeHTML(p.texto || '')}</p>
         ${mediaHtml}
@@ -443,12 +363,5 @@
   }
 </script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    });
-  }
-</script>
 </body>
 </html>
