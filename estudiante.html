@@ -81,7 +81,6 @@
     }
     .status-dot.online { background-color: #10b981 !important; box-shadow: 0 0 8px #10b981 !important; }
 
-    /* Forzar visibilidad de la barra de materias */
     .filter-container {
       background: white !important;
       padding: 0.75rem 1rem !important;
@@ -95,26 +94,25 @@
       z-index: 1900 !important;
       visibility: visible !important;
       opacity: 1 !important;
-      scrollbar-width: none !important;
     }
-    .filter-container::-webkit-scrollbar { display: none !important; }
 
     .filter-btn {
-      background: #f3f4f6 !important;
-      color: #4b5563 !important;
-      border: none !important;
-      padding: 0.4rem 1rem !important;
+      background: #e5e7eb !important;
+      color: #1f2937 !important;
+      border: 1px solid #d1d5db !important;
+      padding: 0.5rem 1.2rem !important;
       border-radius: 9999px !important;
       font-family: 'Poppins', sans-serif !important;
       font-size: 0.85rem !important;
-      font-weight: 500 !important;
+      font-weight: 600 !important;
       cursor: pointer !important;
       display: inline-block !important;
       transition: all 0.2s ease !important;
     }
     .filter-btn.active {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+      background: #4f46e5 !important;
       color: white !important;
+      border-color: #4f46e5 !important;
     }
 
     .new-post-alert {
@@ -122,7 +120,7 @@
       top: 140px !important;
       left: 50% !important;
       transform: translateX(-50%) translateY(-20px) !important;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      background: #10b981 !important;
       color: white !important;
       padding: 0.6rem 1.2rem !important;
       border-radius: 30px !important;
@@ -182,7 +180,7 @@
 <div class="app-layout">
 
   <header class="app-header">
-    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Inicio</a>
+    <a href="index.html" class="back-link">← Inicio</a>
     <h1>Mi Clase</h1>
     <span class="badge-student">Estudiante</span>
     <div class="status-indicator" id="statusIndicator">
@@ -193,7 +191,7 @@
   <div class="filter-container" id="filterContainer">
     <button class="filter-btn active" data-materia="Todos">✨ Todo</button>
     <button class="filter-btn" data-materia="Generales">📢 Avisos</button>
-    <button class="filter-btn" data-materia="Matemáticas">📐 Matemáticas</button>
+    <button class="filter-btn" data-materia="Matemáticas">📐 Mat</button>
     <button class="filter-btn" data-materia="Lengua Española">📚 Lengua</button>
     <button class="filter-btn" data-materia="Ciencias Sociales">🌍 Sociales</button>
     <button class="filter-btn" data-materia="Ciencias Naturales">🌱 Naturales</button>
@@ -205,12 +203,12 @@
   </div>
 
   <div class="new-post-alert" id="newAlert">
-    <i class="fa-solid fa-bell fa-bounce"></i> <span id="alertText">Nueva tarea publicada</span>
+    <span id="alertText">🔔 Nueva tarea publicada</span>
   </div>
 
   <main class="feed-area" id="feed">
-    <div class="loading-spinner">
-      <span>Conectando al aula...</span>
+    <div id="loadingText" style="text-align: center; padding: 3rem; color: #6b7280;">
+      Cargando aula virtual...
     </div>
   </main>
 
@@ -245,12 +243,12 @@
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
 
-  // Pedir permisos nativos de notificación
-  if ("Notification" in window) {
-    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+  // Intentar solicitar permiso nativo al iniciar
+  try {
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission();
     }
-  }
+  } catch(e) { console.log(e); }
 
   newAlert.addEventListener('click', () => {
     materiaSeleccionada = "Todos";
@@ -272,15 +270,8 @@
   const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
 
   onSnapshot(q, (snapshot) => {
-    dot.className = "status-dot online";
-    statusText.textContent = "En línea";
-
-    if (snapshot.empty) {
-      feed.innerHTML = `<p style="text-align:center;padding:2rem;">No hay tareas vigentes.</p>`;
-      isFirstLoad = false;
-      todasLasPublicaciones = [];
-      return;
-    }
+    if(dot) dot.className = "status-dot online";
+    if(statusText) statusText.textContent = "En línea";
 
     const currentDocs = snapshot.docs;
     let hayNuevas = false;
@@ -305,7 +296,7 @@
 
     if (hayNuevas) {
       if (window.scrollY > 100) {
-        alertText.textContent = `Nueva tarea en: ${ultimaMateriaNueva}`;
+        alertText.textContent = `🔔 Nueva tarea en: ${ultimaMateriaNueva}`;
         newAlert.classList.add('visible');
         setTimeout(() => newAlert.classList.remove('visible'), 7000);
       }
@@ -320,8 +311,9 @@
 
     isFirstLoad = false;
 
-  }, () => {
-    statusText.textContent = "Sin conexión";
+  }, (error) => {
+    if(statusText) statusText.textContent = "Error de conexión";
+    console.error(error);
   });
 
   function renderFeed(resaltarNuevas = false) {
@@ -331,24 +323,30 @@
     });
 
     if (publicacionesFiltradas.length === 0) {
-      feed.innerHTML = `<p style="text-align:center;padding:2rem;color:#6b7280;">Sin publicaciones de ${materiaSeleccionada}</p>`;
+      feed.innerHTML = `<p style="text-align:center;padding:3rem;color:#6b7280;font-weight:500;">Sin publicaciones en esta materia.</p>`;
       return;
     }
 
     feed.innerHTML = '';
     publicacionesFiltradas.forEach(p => {
-      const time = p.timestamp?.toDate ? p.timestamp.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'}) : 'Ahora';
+      let time = 'Ahora';
+      try {
+        if (p.timestamp?.toDate) {
+          time = p.timestamp.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
+        }
+      } catch(e) {}
+
       const card = document.createElement('div');
       card.className = 'post-card';
       
       let mediaHtml = p.archivoUrl ? `<img src="${p.archivoUrl}" class="post-img" alt="Material" onclick="window.open('${p.archivoUrl}', '_blank')"/>` : "";
-      let linkHtml = p.archivoUrl ? `<a href="${p.archivoUrl}" target="_blank" class="file-attach-link"><i class="fa-solid fa-file-arrow-down"></i> Descargar Archivo</a>` : "";
+      let linkHtml = p.archivoUrl ? `<a href="${p.archivoUrl}" target="_blank" class="file-attach-link">⬇️ Descargar Adjunto</a>` : "";
 
       card.innerHTML = `
         <div class="post-meta">
-          <span class="author"><i class="fa-solid fa-user-tie"></i> ${p.autor || 'Profesor'}</span>
+          <span class="author">👤 ${p.autor || 'Profesor'}</span>
           <span class="subject-badge">${p.materia || 'Generales'}</span>
-          <span class="time">${time}</span>
+          <span class="time">⏱️ ${time}</span>
         </div>
         <p class="post-text">${escapeHTML(p.texto || '')}</p>
         ${mediaHtml}
