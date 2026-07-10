@@ -13,7 +13,6 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
   <style>
-    /* Estilos Modernos Coherentes con el Panel del Profesor */
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #f3f4f6;
@@ -81,7 +80,6 @@
     }
     .status-dot.online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
 
-    /* Contenedor de Filtros Horizontal Desplazable */
     .filter-container {
       background: white;
       padding: 0.75rem 1rem;
@@ -115,7 +113,6 @@
       box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
     }
 
-    /* Alerta flotante de nueva tarea */
     .new-post-alert {
       position: fixed;
       top: 140px;
@@ -139,7 +136,6 @@
     }
     .new-post-alert.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
 
-    /* Feed y Listado de Asignaciones */
     .feed-area {
       padding: 1.5rem;
       display: flex;
@@ -172,7 +168,6 @@
     .post-meta .author { font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.4rem; }
     .post-meta .time { color: #9ca3af; }
 
-    /* Etiqueta colorida de la Materia */
     .subject-badge {
       background: #e0e7ff;
       color: #4f46e5;
@@ -194,7 +189,6 @@
 
     .post-text { font-size: 0.98rem; line-height: 1.5; color: #4b5563; margin: 0 0 1rem 0; white-space: pre-wrap; }
 
-    /* Descarga de archivos adjuntos */
     .file-attach-link {
       display: inline-flex;
       align-items: center;
@@ -211,10 +205,8 @@
     }
     .file-attach-link:hover { background: #e0e7ff; border-color: #c7d2fe; }
 
-    /* Imagen dentro del post */
     .post-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e5e7eb; cursor: pointer; }
 
-    /* Pantallas de carga y estados vacíos */
     .waiting-screen, .empty-feed {
       text-align: center;
       padding: 5rem 2rem;
@@ -317,7 +309,6 @@
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
 
-  // SOLICITAR PERMISO DE NOTIFICACIONES AL NAVEGADOR
   if ("Notification" in window) {
     if (Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission();
@@ -335,10 +326,8 @@
 
   filterContainer.addEventListener('click', (e) => {
     if (!e.target.classList.contains('filter-btn')) return;
-    
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
-    
     materiaSeleccionada = e.target.getAttribute('data-materia');
     renderFeed();
   });
@@ -382,7 +371,6 @@
 
     renderFeed(hayNuevas);
 
-    // DISPARAR NOTIFICACIONES SI LLEGA ALGO NUEVO
     if (hayNuevas) {
       if (window.scrollY > 100) {
         alertText.textContent = `Nueva tarea en: ${ultimaMateriaNueva}`;
@@ -390,7 +378,6 @@
         setTimeout(() => newAlert.classList.remove('visible'), 7000);
       }
 
-      // Notificación nativa si la ventana no está visible en ese momento
       if (document.hidden && "Notification" in window && Notification.permission === "granted") {
         new Notification(`📢 Nueva tarea: ${ultimaMateriaNueva}`, {
           body: textoCortoNuevo.substring(0, 60) + "...",
@@ -443,7 +430,7 @@
           <span class="subject-badge">${tagMateria}</span>
           <span class="time"><i class="fa-regular fa-clock"></i> ${time}</span>
         </div>
-        <p class="post-text">${escapeHTML(p.texto)}</p>
+        <p class="post-text">${escapeHTML(p.texto || '')}</p>
         ${mediaHtml}
         ${linkHtml}
       `;
