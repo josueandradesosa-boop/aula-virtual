@@ -81,19 +81,53 @@
     }
     .status-dot.online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
 
+    /* Contenedor de Filtros Horizontal Desplazable */
+    .filter-container {
+      background: white;
+      padding: 0.75rem 1rem;
+      display: flex;
+      gap: 0.6rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 69px;
+      z-index: 48;
+      scrollbar-width: none; /* Oculta scroll en Firefox */
+    }
+    .filter-container::-webkit-scrollbar { display: none; } /* Oculta scroll en Chrome */
+
+    .filter-btn {
+      background: #f3f4f6;
+      color: #4b5563;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    }
+
     /* Alerta flotante de nueva tarea */
     .new-post-alert {
       position: fixed;
-      top: 80px;
+      top: 140px;
       left: 50%;
       transform: translateX(-50%) translateY(-20px);
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       padding: 0.6rem 1.2rem;
       border-radius: 30px;
       font-size: 0.85rem;
       font-weight: 600;
-      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
       z-index: 45;
       opacity: 0;
       pointer-events: none;
@@ -138,6 +172,16 @@
     .post-meta .author { font-weight: 600; color: #374151; display: flex; align-items: center; gap: 0.4rem; }
     .post-meta .time { color: #9ca3af; }
 
+    /* Etiqueta colorida de la Materia */
+    .subject-badge {
+      background: #e0e7ff;
+      color: #4f46e5;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
     .new-badge {
       background: #fef3c7;
       color: #92400e;
@@ -166,6 +210,9 @@
       border: 1px solid #e5e7eb;
     }
     .file-attach-link:hover { background: #e0e7ff; border-color: #c7d2fe; }
+
+    /* Imagen dentro del post */
+    .post-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e5e7eb; cursor: pointer; }
 
     /* Pantallas de carga y estados vacíos */
     .waiting-screen, .empty-feed {
@@ -214,8 +261,22 @@
     </div>
   </header>
 
+  <div class="filter-container" id="filterContainer">
+    <button class="filter-btn active" data-materia="Todos">✨ Todo</button>
+    <button class="filter-btn" data-materia="Generales">📢 Avisos</button>
+    <button class="filter-btn" data-materia="Matemáticas">📐 Matemáticas</button>
+    <button class="filter-btn" data-materia="Lengua Española">📚 Lengua</button>
+    <button class="filter-btn" data-materia="Ciencias Sociales">🌍 Sociales</button>
+    <button class="filter-btn" data-materia="Ciencias Naturales">🌱 Naturales</button>
+    <button class="filter-btn" data-materia="Cívica">⚖️ Cívica</button>
+    <button class="filter-btn" data-materia="Informática">💻 Info</button>
+    <button class="filter-btn" data-materia="Artística">🎨 Arte</button>
+    <button class="filter-btn" data-materia="Inglés">🗣️ Inglés</button>
+    <button class="filter-btn" data-materia="Francés">🥖 Francés</button>
+  </div>
+
   <div class="new-post-alert" id="newAlert">
-    <i class="fa-solid fa-bell-ring fa-bounce"></i> Nueva tarea publicada por el Profesor
+    <i class="fa-solid fa-bell fa-bounce"></i> <span id="alertText">Nueva tarea publicada</span>
   </div>
 
   <main class="feed-area" id="feed">
@@ -244,17 +305,37 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  const feed      = document.getElementById('feed');
-  const statusText = document.getElementById('statusText');
-  const dot       = document.getElementById('dot');
-  const newAlert  = document.getElementById('newAlert');
+  const feed        = document.getElementById('feed');
+  const statusText  = document.getElementById('statusText');
+  const dot         = document.getElementById('dot');
+  const newAlert    = document.getElementById('newAlert');
+  const alertText   = document.getElementById('alertText');
+  const filterContainer = document.getElementById('filterContainer');
 
   let isFirstLoad = true;
   let knownIds = new Set();
+  let todasLasPublicaciones = [];
+  let materiaSeleccionada = "Todos";
 
   newAlert.addEventListener('click', () => {
+    // Al hacer clic, quita filtros, muestra todo y sube
+    materiaSeleccionada = "Todos";
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-materia="Todos"]').classList.add('active');
+    renderFeed();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     newAlert.classList.remove('visible');
+  });
+
+  // Manejo de clicks en los botones de filtro
+  filterContainer.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('filter-btn')) return;
+    
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    
+    materiaSeleccionada = e.target.getAttribute('data-materia');
+    renderFeed();
   });
 
   const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
@@ -271,45 +352,37 @@
           <p style="margin-top:0.25rem; font-size:0.9rem; color: #9ca3af;">Esperando las asignaciones del profesor...</p>
         </div>`;
       isFirstLoad = false;
+      todasLasPublicaciones = [];
       return;
     }
 
-    const newIds = new Set(snapshot.docs.map(d => d.id));
+    // Detectar si hay publicaciones realmente nuevas
+    const currentDocs = snapshot.docs;
     let hayNuevas = false;
+    let ultimaMateriaNueva = "Generales";
+
     if (!isFirstLoad) {
-      newIds.forEach(id => { if (!knownIds.has(id)) hayNuevas = true; });
-    }
-    knownIds = newIds;
-
-    feed.innerHTML = '';
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      const time = d.timestamp?.toDate
-        ? d.timestamp.toDate().toLocaleString('es', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
-        : 'Ahora';
-
-      const card = document.createElement('div');
-      card.className = 'post-card';
-      
-      let linkHtml = "";
-      if (d.archivoUrl) {
-        linkHtml = `<a href="${d.archivoUrl}" target="_blank" class="file-attach-link"><i class="fa-solid fa-file-arrow-down"></i> Descargar Recurso</a>`;
+      for (let doc of currentDocs) {
+        if (!knownIds.has(doc.id)) {
+          hayNuevas = true;
+          ultimaMateriaNueva = doc.data().materia || "Generales";
+          break; 
+        }
       }
+    }
 
-      card.innerHTML = `
-        <div class="post-meta">
-          <span class="author"><i class="fa-solid fa-user-tie"></i> ${d.autor || 'Profesor'} ${hayNuevas && !isFirstLoad ? '<span class="new-badge">Nuevo</span>' : ''}</span>
-          <span class="time"><i class="fa-regular fa-clock"></i> ${time}</span>
-        </div>
-        <p class="post-text">${escapeHTML(d.texto)}</p>
-        ${linkHtml}
-      `;
-      feed.appendChild(card);
-    });
+    // Actualizar base de IDs conocidos
+    knownIds = new Set(currentDocs.map(d => d.id));
+    todasLasPublicaciones = currentDocs.map(d => ({ id: d.id, ...d.data() }));
 
+    // Pintar los posts aplicando el filtro actual
+    renderFeed(hayNuevas);
+
+    // Si hay una tarea nueva de una materia, lanzar la alerta flotante personalizada
     if (hayNuevas && window.scrollY > 100) {
+      alertText.textContent = `Nueva tarea en: ${ultimaMateriaNueva}`;
       newAlert.classList.add('visible');
-      setTimeout(() => newAlert.classList.remove('visible'), 6000);
+      setTimeout(() => newAlert.classList.remove('visible'), 7000);
     }
 
     isFirstLoad = false;
@@ -319,6 +392,52 @@
     statusText.textContent = "Sin conexión";
     feed.innerHTML = `<div class="empty-feed"><div class="empty-icon"><i class="fa-solid fa-satellite-dish"></i></div><p>Sin conexión. Verifica tu acceso a internet.</p></div>`;
   });
+
+  // Función encargada de dibujar los posts en pantalla dependiendo del filtro
+  function renderFeed(resaltarNuevas = false) {
+    // Filtrar array completo
+    const publicacionesFiltradas = todasLasPublicaciones.filter(p => {
+      if (materiaSeleccionada === "Todos") return true;
+      const tag = p.materia || "Generales";
+      return tag === materiaSeleccionada;
+    });
+
+    if (publicacionesFiltradas.length === 0) {
+      feed.innerHTML = `
+        <div class="waiting-screen">
+          <div class="big-icon"><i class="fa-solid fa-folder-open"></i></div>
+          <p style="font-weight: 500; font-size: 1rem; color: #6b7280;">Sin publicaciones de ${materiaSeleccionada}</p>
+        </div>`;
+      return;
+    }
+
+    feed.innerHTML = '';
+    publicacionesFiltradas.forEach(p => {
+      const time = p.timestamp?.toDate
+        ? p.timestamp.toDate().toLocaleString('es', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
+        : 'Ahora';
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      
+      let mediaHtml = p.archivoUrl ? `<img src="${p.archivoUrl}" class="post-img" alt="Material" onclick="window.open('${p.archivoUrl}', '_blank')"/>` : "";
+      let linkHtml = p.archivoUrl ? `<a href="${p.archivoUrl}" target="_blank" class="file-attach-link"><i class="fa-solid fa-file-arrow-down"></i> Descargar Recurso</a>` : "";
+
+      const tagMateria = p.materia || 'Generales';
+
+      card.innerHTML = `
+        <div class="post-meta">
+          <span class="author"><i class="fa-solid fa-user-tie"></i> ${p.autor || 'Profesor'} ${resaltarNuevas && isFirstLoad === false ? '<span class="new-badge">Nuevo</span>' : ''}</span>
+          <span class="subject-badge">${tagMateria}</span>
+          <span class="time"><i class="fa-regular fa-clock"></i> ${time}</span>
+        </div>
+        <p class="post-text">${escapeHTML(p.texto)}</p>
+        ${mediaHtml}
+        ${linkHtml}
+      `;
+      feed.appendChild(card);
+    });
+  }
 
   function escapeHTML(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
