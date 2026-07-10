@@ -39,7 +39,6 @@
     .role-btn .btn-text h3 { margin: 0; font-size: 1.1rem; color: #1f2937; font-weight: 600; }
     .role-btn .btn-text p { margin: 0; font-size: 0.85rem; color: #6b7280; }
 
-    /* BOTÓN SECRETO PARA EL ADMIN */
     .admin-secret-link {
       display: inline-block; margin-top: 2rem; color: #d1d5db; 
       text-decoration: none; font-size: 0.8rem; transition: color 0.3s;
@@ -75,26 +74,6 @@
     }
     .btn-enter:hover { transform: translateY(-2px); }
     .btn-back { display: block; margin-top: 1rem; color: #6b7280; text-decoration: none; font-size: 0.85rem; cursor: pointer; }
-
-    /* Layout Principal App Estudiante */
-    .app-layout { max-width: 600px; margin: 0 auto; background: #f9fafb; min-height: 100vh; display: none; flex-direction: column; }
-    .app-header { background: white; padding: 1.25rem; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-    .app-header h1 { font-size: 1.1rem; font-weight: 700; margin: 0; }
-    .badge-student { background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
-    
-    /* Feed Area */
-    .feed-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
-    .post-card { background: white; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
-    .post-meta { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; }
-    .post-meta .author { font-weight: 600; color: #374151; }
-    .post-meta .time { color: #9ca3af; }
-    .post-text { font-size: 0.98rem; line-height: 1.5; color: #4b5563; margin: 0 0 0.75rem 0; white-space: pre-wrap; }
-    
-    .file-attach-link { display: inline-flex; align-items: center; gap: 0.5rem; background: #f3f4f6; padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.85rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
-    .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; color: #6b7280; }
-    .spinner { width: 35px; height: 35px; border: 4px solid rgba(59, 130, 246, 0.1); border-left-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .empty-feed { text-align: center; padding: 4rem; color: #9ca3af; }
   </style>
 </head>
 <body>
@@ -151,26 +130,9 @@
   </div>
 </div>
 
-<div class="app-layout" id="appContent">
-  <header class="app-header">
-    <div>
-      <h1 id="welcomeText">Cargando...</h1>
-      <span id="studentMeta" style="font-size:0.8rem; color:#6b7280;"></span>
-    </div>
-    <span class="badge-student">Estudiante</span>
-  </header>
-
-  <main class="feed-area" id="feed">
-    <div class="loading-spinner">
-      <div class="spinner"></div>
-      <span>Cargando tareas asignadas...</span>
-    </div>
-  </main>
-</div>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, orderBy, query, limit, doc, setDoc, serverTimestamp } 
+  import { getFirestore, doc, setDoc, serverTimestamp } 
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -184,9 +146,6 @@
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
-
-  let userIdLog = ""; 
-  let asistenciaIdLog = "";
 
   document.getElementById('chooseTeacher').addEventListener('click', () => {
     window.location.href = "profesor.html";
@@ -212,55 +171,26 @@
       return;
     }
 
-    userIdLog = `alumno_${lista}_${nombre.replace(/\s+/g, '_')}`;
-    asistenciaIdLog = `asist_${Date.now()}_${lista}`;
+    const userIdLog = `alumno_${lista}_${nombre.replace(/\s+/g, '_')}`;
+    const asistenciaIdLog = `asist_${Date.now()}_${lista}`;
 
-    await setDoc(doc(db, 'usuarios', userIdLog), { nombre, rol: 'alumno', curso, numLista: lista, estado: 'online' }, { merge: true });
-    await setDoc(doc(db, 'asistencia', asistenciaIdLog), { nombre, rol: 'alumno', curso, numLista: lista, entrada: serverTimestamp(), salida: null });
-
-    localStorage.setItem('user_log_id', userIdLog);
-    localStorage.setItem('asist_log_id', asistenciaIdLog);
-
-    document.getElementById('registerScreen').style.display = 'none';
-    document.getElementById('appContent').style.display = 'flex';
-    document.getElementById('welcomeText').textContent = `Hola, ${nombre.split(' ')[0]} 👋`;
-    document.getElementById('studentMeta').textContent = `${curso} | N° Lista: ${lista}`;
-
-    iniciarFeedAlumnos();
-  });
-
-  window.addEventListener('beforeunload', () => {
-    const uId = userIdLog || localStorage.getItem('user_log_id');
-    const aId = asistenciaIdLog || localStorage.getItem('asist_log_id');
-    if(uId && aId) {
-      setDoc(doc(db, 'usuarios', uId), { estado: 'offline' }, { merge: true });
-      setDoc(doc(db, 'asistencia', aId), { salida: serverTimestamp() }, { merge: true });
+    // Guardar asistencia y estado en Firebase antes de irse
+    try {
+      await setDoc(doc(db, 'usuarios', userIdLog), { nombre, rol: 'alumno', curso, numLista: lista, estado: 'online' }, { merge: true });
+      await setDoc(doc(db, 'asistencia', asistenciaIdLog), { nombre, rol: 'alumno', curso, numLista: lista, entrada: serverTimestamp(), salida: null });
+      
+      localStorage.setItem('user_log_id', userIdLog);
+      localStorage.setItem('asist_log_id', asistenciaIdLog);
+      localStorage.setItem('student_name', nombre);
+      localStorage.setItem('student_course', curso);
+      localStorage.setItem('student_list', lista);
+      
+      // REDIRECCIÓN MÁGICA HACIA LA PÁGINA CORRECTA
+      window.location.href = "estudiante.html";
+    } catch (e) {
+      alert("Hubo un problema al conectar con el servidor.");
     }
   });
-
-  function iniciarFeedAlumnos() {
-    const feed = document.getElementById('feed');
-    const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
-    
-    onSnapshot(q, (snapshot) => {
-      if (snapshot.empty) {
-        feed.innerHTML = `<div class="empty-feed"><p>📚 No hay asignaciones publicadas por el profesor todavía.</p></div>`;
-        return;
-      }
-      feed.innerHTML = '';
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const time = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) : 'Ahora';
-        const card = document.createElement('div');
-        card.className = 'post-card';
-        let linkHtml = d.archivoUrl ? `<img src="${d.archivoUrl}" style="width:100%; border-radius:12px; margin-top:8px;"/>` : "";
-        card.innerHTML = `<div class="post-meta"><span class="author"><i class="fa-solid fa-user-tie"></i> ${d.autor}</span><span class="time"><i class="fa-regular fa-clock"></i> ${time}</span></div><p class="post-text">${escapeHTML(d.texto)}</p>${linkHtml}`;
-        feed.appendChild(card);
-      });
-    });
-  }
-
-  function escapeHTML(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 </body>
 </html>
