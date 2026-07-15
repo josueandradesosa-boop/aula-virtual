@@ -7,25 +7,99 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="style.css" />
+  
+  <style>
+    /* Estilos decorativos exclusivos para la portada */
+    body {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%) !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Esferas decorativas de fondo */
+    .decoracion-globo {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      animation: flotarGlobo 8s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .globo-1 { width: 140px; height: 140px; top: 10%; left: 5%; }
+    .globo-2 { width: 220px; height: 220px; bottom: 8%; right: -5%; animation-delay: 2s; }
+    
+    @keyframes flotarGlobo {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(10deg); }
+    }
+
+    /* Caja de selección de roles mejorada (Glassmorphism sutil) */
+    .role-box {
+      background: rgba(255, 255, 255, 0.96) !important;
+      border: 1px solid rgba(255, 255, 255, 0.5) !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+      border-radius: 28px !important;
+      z-index: 10;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    /* Botones con animaciones premium al pasar el mouse */
+    .role-btn {
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+      border: 2px solid #e5e7eb !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-btn:hover {
+      transform: translateY(-4px) !important;
+      background: #ffffff !important;
+    }
+
+    .role-btn.student-opt:hover {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 12px 20px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    .role-btn.teacher-opt:hover {
+      border-color: #7c3aed !important;
+      box-shadow: 0 12px 20px rgba(124, 58, 237, 0.15) !important;
+    }
+
+    /* Animación para agrandar suavemente los iconos de los botones al hacer hover */
+    .role-btn:hover i {
+      transform: scale(1.15);
+      transition: transform 0.3s ease;
+    }
+
+    /* Enlace de administrador inferior elegante */
+    .admin-secret-link {
+      transition: all 0.2s ease !important;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+    }
+    .admin-secret-link:hover {
+      color: #4f46e5 !important;
+      background: rgba(79, 70, 229, 0.08);
+    }
+  </style>
 </head>
 <body>
 
-<div class="bg-decorations">
-  <div class="circle circle-1"></div>
-  <div class="circle circle-2"></div>
-  <div class="circle circle-3"></div>
-</div>
+<div class="decoracion-globo globo-1"></div>
+<div class="decoracion-globo globo-2"></div>
 
 <div class="role-screen" id="roleScreen">
   <div class="role-box">
-    <h2>¡Bienvenido al Aula!</h2>
-    <p class="subtitle">Por favor, selecciona tu rol para ingresar</p>
+    <h2>¡Bienvenido al Aula Virtual!</h2>
+    <p>Por favor, selecciona tu rol para ingresar al portal</p>
     
     <div class="role-options">
       <button class="role-btn student-opt" id="chooseStudent">
-        <div class="icon-wrapper">
-          <i class="fa-solid fa-user-graduate"></i>
-        </div>
+        <i class="fa-solid fa-user-graduate"></i>
         <div class="btn-text">
           <h3>Soy Estudiante</h3>
           <p>Ver mis tareas, comunicados y descargar materiales</p>
@@ -33,9 +107,7 @@
       </button>
 
       <button class="role-btn teacher-opt" id="chooseTeacher">
-        <div class="icon-wrapper">
-          <i class="fa-solid fa-user-tie"></i>
-        </div>
+        <i class="fa-solid fa-user-tie"></i>
         <div class="btn-text">
           <h3>Soy Profesor</h3>
           <p>Subir asignaciones, adjuntar archivos y panel de control</p>
