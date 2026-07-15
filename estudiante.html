@@ -264,22 +264,36 @@
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
 
-  // BOTÓN DE CERRAR SESIÓN (VOLVER A EMPEZAR DESDE CERO)
+  // ENVIAR LATIDO DE PRESENCIA CADA 20 SEGUNDOS MIENTRAS LA WEB ESTÉ ABIERTA
+  setInterval(async () => {
+    const uId = localStorage.getItem('user_log_id');
+    if (uId) {
+      try {
+        await setDoc(doc(db, 'usuarios', uId), { 
+          estado: 'online', 
+          ultimaActividad: serverTimestamp() 
+        }, { merge: true });
+      } catch(e) { console.log(e); }
+    }
+  }, 20000); // 20 segundos
+
+  // BOTÓN DE CERRAR SESIÓN
   document.getElementById('btnLogout').addEventListener('click', async () => {
     const confirmacion = confirm("¿Quieres cerrar sesión y registrar otro estudiante de cero?");
     if (confirmacion) {
       const uId = localStorage.getItem('user_log_id');
       const aId = localStorage.getItem('asist_log_id');
 
-      // Avisar a Firebase que sale
-      if (uId && aId) {
+      // Avisar a Firebase que sale colocándolo offline de inmediato
+      if (uId) {
         try {
-          await setDoc(doc(db, 'usuarios', uId), { estado: 'offline' }, { merge: true });
-          await setDoc(doc(db, 'asistencia', aId), { salida: serverTimestamp() }, { merge: true });
+          await setDoc(doc(db, 'usuarios', uId), { estado: 'offline', ultimaActividad: null }, { merge: true });
+          if(aId) {
+            await setDoc(doc(db, 'asistencia', aId), { salida: serverTimestamp() }, { merge: true });
+          }
         } catch(e) {}
       }
 
-      // Limpiar memoria y redirigir
       localStorage.clear();
       window.location.href = "index.html";
     }
