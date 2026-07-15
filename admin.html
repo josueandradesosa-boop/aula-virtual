@@ -3,153 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Control - Administrador Supremo</title>
+  <title>Panel de Control – Administración</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f3f4f6;
-      color: #1f2937;
-      margin: 0; padding: 0;
-    }
-    /* Login Administrador */
-    .admin-login {
-      position: fixed; inset: 0;
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-      display: flex; align-items: center; justify-content: center; z-index: 999;
-    }
-    .login-box {
-      background: white; border-radius: 24px; padding: 3rem 2rem;
-      width: 100%; max-width: 400px; text-align: center;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-    }
-    .login-box i { font-size: 3.5rem; color: #4f46e5; margin-bottom: 1rem; }
-    .login-box input {
-      width: 100%; box-sizing: border-box; padding: 0.85rem;
-      border: 2px solid #e5e7eb; border-radius: 12px; margin: 1rem 0;
-      text-align: center; font-size: 1.1rem; outline: none;
-    }
-    .login-box input:focus { border-color: #4f46e5; }
-    .btn-login {
-      width: 100%; background: #4f46e5; color: white; border: none;
-      padding: 0.9rem; border-radius: 12px; font-weight: 600; cursor: pointer;
-    }
-
-    /* Layout Principal */
-    .admin-layout { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; display: none; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    header h1 { font-size: 1.8rem; color: #111827; margin: 0; }
-    .btn-logout { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 500; }
-
-    /* Tarjetas de Estadísticas rápidos */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .stat-card { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; }
-    .stat-card .icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .stat-card.users .icon { background: #e0e7ff; color: #4f46e5; }
-    .stat-card.active .icon { background: #d1fae5; color: #10b981; }
-    .stat-card.teachers .icon { background: #fef3c7; color: #d97706; }
-    .stat-info h3 { margin: 0; font-size: 0.9rem; color: #6b7280; font-weight: 500; }
-    .stat-info p { margin: 0; font-size: 1.8rem; font-weight: 700; color: #111827; }
-
-    /* Tablas Modernas */
-    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .table-container { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 2.5rem; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th { background: #f9fafb; padding: 1rem; color: #4b5563; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
-    td { padding: 1rem; border-bottom: 1px solid #f3f4f6; font-size: 0.95rem; vertical-align: middle; }
-    tr:hover td { background: #f9fafb; }
+    body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; color: #1f2937; margin: 0; padding: 2rem; }
+    .admin-container { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f3f4f6; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    h1 { margin: 0; font-size: 1.5rem; color: #1e1b4b; }
+    .btn-back { background: #e5e7eb; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; cursor: pointer; text-decoration: none; color: #4b5563; font-size: 0.9rem; }
     
-    /* Estados */
-    .badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
-    .badge.profesor { background: #fef3c7; color: #d97706; }
-    .badge.alumno { background: #e0e7ff; color: #4f46e5; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.5rem; }
-    .status-dot.online { background: #10b981; box-shadow: 0 0 8px #10b981; }
-    .status-dot.offline { background: #9ca3af; }
+    .grid-admin { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 768px) { .grid-admin { grid-template-columns: 1.2fr 0.8fr; } }
+    
+    .card-panel { border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; }
+    .card-panel h2 { margin-top: 0; font-size: 1.2rem; color: #374151; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    
+    .student-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid #f3f4f6; }
+    .student-row:last-child { border-bottom: none; }
+    .student-info { display: flex; flex-direction: column; }
+    .student-info .name { font-weight: 600; color: #1f2937; font-size: 0.95rem; }
+    .student-info .meta { font-size: 0.8rem; color: #6b7280; }
+    
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .status-badge.online { background-color: #d1fae5; color: #065f46; }
+    .status-badge.offline { background-color: #f3f4f6; color: #4b5563; }
   </style>
 </head>
 <body>
 
-<div class="admin-login" id="adminLogin">
-  <div class="login-box">
-    <i class="fa-solid fa-user-shield"></i>
-    <h2>Panel de Control Master</h2>
-    <p>Ingresa tu llave de administrador</p>
-    <input type="password" id="adminPass" placeholder="Contraseña Maestra" autocomplete="off" />
-    <button class="btn-login" id="btnLogin">Acceder al Sistema</button>
-  </div>
-</div>
-
-<div class="admin-layout" id="adminContent">
+<div class="admin-container">
   <header>
-    <div>
-      <h1>Control General del Aula</h1>
-      <span style="color:#6b7280; font-size:0.9rem;">Monitoreo de asistencia y usuarios activos</span>
-    </div>
-    <button class="btn-logout" id="btnLogout"><i class="fa-solid fa-power-off"></i> Cerrar Sesión</button>
+    <h1>⚙️ Panel del Administrador</h1>
+    <a href="index.html" class="btn-back">⬅️ Volver al Inicio</a>
   </header>
 
-  <div class="stats-grid">
-    <div class="stat-card users">
-      <div class="icon"><i class="fa-solid fa-users"></i></div>
-      <div class="stat-info"><h3>Total Alumnos</h3><p id="countAlumnos">0</p></div>
+  <div class="grid-admin">
+    <div class="card-panel">
+      <h2><i class="fa-solid fa-users"></i> Alumnos Registrados y Presencia</h2>
+      <div id="usersList">
+        <p style="text-align: center; color: #9ca3af;">Cargando lista de alumnos...</p>
+      </div>
     </div>
-    <div class="stat-card teachers">
-      <div class="icon"><i class="fa-solid fa-user-tie"></i></div>
-      <div class="stat-info"><h3>Total Profesores</h3><p id="countProfesores">0</p></div>
+    
+    <div class="card-panel">
+      <h2><i class="fa-solid fa-clock-rotate-left"></i> Registro de Asistencias</h2>
+      <div id="attendanceList" style="max-height: 400px; overflow-y: auto; font-size: 0.85rem; color: #4b5563;">
+        <p style="text-align: center; color: #9ca3af;">Cargando historial...</p>
+      </div>
     </div>
-    <div class="stat-card active">
-      <div class="icon"><i class="fa-solid fa-signal"></i></div>
-      <div class="stat-info"><h3>En Línea Ahora</h3><p id="countActivos">0</p></div>
-    </div>
-  </div>
-
-  <div class="section-title"><i class="fa-solid fa-id-card"></i> Usuarios en la Plataforma</div>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Rol</th>
-          <th>Curso</th>
-          <th>N° Lista</th>
-          <th>Estado Actual</th>
-        </tr>
-      </thead>
-      <tbody id="tablaUsuarios">
-        <tr><td colspan="5" style="text-align:center; color:#9ca3af;">Cargando base de datos...</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Historial de Accesos (Entradas/Salidas)</div>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Usuario</th>
-          <th>Rol</th>
-          <th>Curso / Detalles</th>
-          <th>Hora de Entrada</th>
-          <th>Hora de Salida</th>
-        </tr>
-      </thead>
-      <tbody id="tablaAsistencia">
-        <tr><td colspan="5" style="text-align:center; color:#9ca3af;">No hay accesos registrados el día de hoy.</td></tr>
-      </tbody>
-    </table>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, orderBy, query } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // CLAVE MAESTRA PRIVADA PARA TI: Puedes cambiarla aquí abajo
-  const CONTRA_ADMIN = "adminmaster123";
-
-  // CONFIGURACIÓN DE TU COMPAÑÍA FIREBASE NATIVA
   const firebaseConfig = {
     apiKey: "AIzaSyBynAiyunaie-L49lT_mJ3W7SiQRB9sDVw",
     authDomain: "clases-68cf1.firebaseapp.com",
@@ -162,94 +72,76 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  // Manejo de Inicio de Sesión de Admin
-  if(sessionStorage.getItem('admin_auth') === 'ok') { mostrarAdmin(); }
-  document.getElementById('btnLogin').addEventListener('click', () => {
-    if(document.getElementById('adminPass').value === "1226") {
-      sessionStorage.setItem('admin_auth', 'ok');
-      mostrarAdmin();
-    } else {
-      alert("⚠️ Llave incorrecta. Acceso denegado.");
+  const usersList = document.getElementById('usersList');
+  const attendanceList = document.getElementById('attendanceList');
+
+  // ESCUCHAR USUARIOS Y DETERMINAR SU ESTADO DE ACTIVIDAD REAL
+  onSnapshot(collection(db, 'usuarios'), (snapshot) => {
+    if (snapshot.empty) {
+      usersList.innerHTML = `<p style="text-align: center; color: #9ca3af;">No hay alumnos registrados.</p>`;
+      return;
     }
+
+    usersList.innerHTML = '';
+    const ahora = Date.now();
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if (d.rol === 'alumno') {
+        const row = document.createElement('div');
+        row.className = 'student-row';
+
+        // Obtener la fecha del último latido de actividad
+        const ultimaConexion = d.ultimaActividad?.toDate ? d.ultimaActividad.toDate().getTime() : 0;
+        
+        // FILTRO DE INACTIVIDAD: si pasaron más de 45 segundos, se considera Offline de verdad
+        const estaActivoRealmente = (ahora - ultimaConexion) < 45000; 
+        const estadoFinal = (d.estado === 'online' && estaActivoRealmente) ? 'online' : 'offline';
+
+        row.innerHTML = `
+          <div class="student-info">
+            <span class="name">${d.nombre}</span>
+            <span class="meta">${d.curso || 'Sin curso'} | Lista N° ${d.numLista || 'N/A'}</span>
+          </div>
+          <span class="status-badge ${estadoFinal}">${estadoFinal}</span>
+        `;
+        usersList.appendChild(row);
+      }
+    });
   });
-  document.getElementById('btnLogout').addEventListener('click', () => {
-    sessionStorage.clear();
-    window.location.reload();
-  });
 
-  function mostrarAdmin() {
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminContent').style.display = 'block';
-    cargarDatosReales();
-  }
+  // ESCUCHAR HISTORIAL DE ASISTENCIA
+  const qAsist = query(collection(db, 'asistencia'), orderBy('entrada', 'desc'));
+  onSnapshot(qAsist, (snapshot) => {
+    if (snapshot.empty) {
+      attendanceList.innerHTML = `<p style="text-align: center; color: #9ca3af;">No hay registros de asistencia hoy.</p>`;
+      return;
+    }
 
-  function cargarDatosReales() {
-    // 1. Escuchar Usuarios Registrados en tiempo real
-    onSnapshot(collection(db, 'usuarios'), (snapshot) => {
-      const tbody = document.getElementById('tablaUsuarios');
-      tbody.innerHTML = '';
-      let alumCount = 0, profCount = 0, activeCount = 0;
+    attendanceList.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      let entradaStr = 'N/A';
+      let salidaStr  = 'En clase';
 
-      if(snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay usuarios registrados en el sistema.</td></tr>';
+      if (d.entrada?.toDate) {
+        entradaStr = d.entrada.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
+      }
+      if (d.salida?.toDate) {
+        salidaStr = d.salida.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
       }
 
-      snapshot.forEach(doc => {
-        const u = doc.data();
-        if(u.rol === 'profesor') profCount++; else alumCount++;
-        if(u.estado === 'online') activeCount++;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="font-weight:600; color:#374151;">${u.nombre}</td>
-          <td><span class="badge ${u.rol}">${u.rol.toUpperCase()}</span></td>
-          <td style="color:#6b7280;">${u.curso || '—'}</td>
-          <td style="color:#6b7280; font-weight:500;">${u.numLista || '—'}</td>
-          <td>
-            <span class="status-dot ${u.estado === 'online' ? 'online' : 'offline'}"></span>
-            <span style="font-weight:500; color:${u.estado === 'online' ? '#10b981':'#6b7280'}">
-              ${u.estado === 'online' ? 'En Línea' : 'Desconectado'}
-            </span>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('countAlumnos').textContent = alumCount;
-      document.getElementById('countProfesores').textContent = profCount;
-      document.getElementById('countActivos').textContent = activeCount;
+      const row = document.createElement('div');
+      row.style.padding = '0.5rem 0';
+      row.style.borderBottom = '1px dashed #e5e7eb';
+      row.innerHTML = `
+        <strong>${d.nombre}</strong> (${d.curso})<br/>
+        <span style="color:#10b981;">▶ Entró: ${entradaStr}</span> | 
+        <span style="color:#ef4444;">■ Salió: ${salidaStr}</span>
+      `;
+      attendanceList.appendChild(row);
     });
-
-    // 2. Escuchar Historial de Asistencias (Entradas y Salidas)
-    const qAsistencia = query(collection(db, 'asistencia'), orderBy('entrada', 'desc'));
-    onSnapshot(qAsistencia, (snapshot) => {
-      const tbody = document.getElementById('tablaAsistencia');
-      tbody.innerHTML = '';
-
-      if(snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#9ca3af;">Aún no se registran accesos hoy.</td></tr>';
-        return;
-      }
-
-      snapshot.forEach(doc => {
-        const a = doc.data();
-        const horaEntrada = a.entrada?.toDate ? a.entrada.toDate().toLocaleString('es-ES', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'}) : 'Conectando...';
-        const horaSalida = a.salida?.toDate ? a.salida.toDate().toLocaleString('es-ES', {hour:'2-digit', minute:'2-digit', second:'2-digit'}) : '🟢 Activo en la App';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="font-weight:600; color:#111827;">${a.nombre}</td>
-          <td><span class="badge ${a.rol}">${a.rol.toUpperCase()}</span></td>
-          <td style="color:#4b5563; font-size:0.85rem;">${a.rol === 'alumno' ? `Curso: ${a.curso} | N° ${a.numLista}` : 'Acceso Aula'}</td>
-          <td style="color:#4b5563; font-weight:500;"><i class="fa-regular fa-calendar-check" style="color:#10b981;"></i> ${horaEntrada}</td>
-          <td style="font-weight:600; color:${a.salida ? '#4b5563' : '#10b981'};">
-            ${a.salida ? `<i class="fa-regular fa-calendar-minus" style="color:#ef4444;"></i> ${horaSalida}` : `<i class="fa-solid fa-circle-play fa-fade"></i> Dentro de la app`}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    });
-  }
+  });
 </script>
 </body>
 </html>
