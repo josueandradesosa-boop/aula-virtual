@@ -74,6 +74,30 @@
     }
     .btn-enter:hover { transform: translateY(-2px); }
     .btn-back { display: block; margin-top: 1rem; color: #6b7280; text-decoration: none; font-size: 0.85rem; cursor: pointer; }
+
+    /* Estilos para el aviso de cuenta detectada */
+    .detected-account-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    .detected-account-box p { margin: 0 0 0.5rem 0; font-size: 0.85rem; color: #1e40af; }
+    .detected-account-box strong { color: #1e3a8a; display: block; font-size: 1rem; }
+    .btn-reset-register {
+      background: none;
+      border: none;
+      color: #ef4444;
+      text-decoration: underline;
+      font-size: 0.8rem;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      padding: 0;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -110,20 +134,28 @@
     <i class="fa-solid fa-graduation-cap"></i>
     <h2>Identificación de Alumno</h2>
     <p>Ingresa tus datos reales para pasar asistencia</p>
+
+    <div id="detectedAccount" class="detected-account-box" style="display: none;">
+      <p>Detectamos un registro guardado:</p>
+      <strong id="detectedDetails">Nombre (Curso)</strong>
+      <button type="button" class="btn-reset-register" id="btnResetRegister">❌ Borrar y registrar otro alumno</button>
+    </div>
     
-    <input type="text" id="studentName" placeholder="Nombre y Apellido completo" autocomplete="off" />
-    
-    <select id="studentCourse">
-      <option value="" disabled selected>Selecciona tu Curso</option>
-      <option value="1er Grado">1er Grado</option>
-      <option value="2do Grado">2do Grado</option>
-      <option value="3er Grado">3er Grado</option>
-      <option value="4to Grado">4to Grado</option>
-      <option value="5to Grado">5to Grado</option>
-      <option value="6to Grado">6to Grado</option>
-    </select>
-    
-    <input type="number" id="studentList" placeholder="Número de Lista" min="1" max="50" autocomplete="off" />
+    <div id="registerFields">
+      <input type="text" id="studentName" placeholder="Nombre y Apellido completo" autocomplete="off" />
+      
+      <select id="studentCourse">
+        <option value="" disabled selected>Selecciona tu Curso</option>
+        <option value="1er Grado">1er Grado</option>
+        <option value="2do Grado">2do Grado</option>
+        <option value="3er Grado">3er Grado</option>
+        <option value="4to Grado">4to Grado</option>
+        <option value="5to Grado">5to Grado</option>
+        <option value="6to Grado">6to Grado</option>
+      </select>
+      
+      <input type="number" id="studentList" placeholder="Número de Lista" min="1" max="50" autocomplete="off" />
+    </div>
     
     <button class="btn-enter" id="btnEnter">Ingresar al Aula</button>
     <span class="btn-back" id="backToRoles"><i class="fa-solid fa-arrow-left"></i> Volver atrás</span>
@@ -151,9 +183,33 @@
     window.location.href = "profesor.html";
   });
 
+  // AL HACER CLIC EN ESTUDIANTE
   document.getElementById('chooseStudent').addEventListener('click', () => {
+    const savedName = localStorage.getItem('student_name');
+    const savedCourse = localStorage.getItem('student_course');
+    const savedList = localStorage.getItem('student_list');
+
+    // Si ya tiene datos guardados, entra directo sin preguntar
+    if (savedName && savedCourse && savedList) {
+      window.location.href = "estudiante.html";
+      return;
+    }
+
+    // Si no tiene datos, muestra el formulario limpio
+    document.getElementById('detectedAccount').style.display = 'none';
+    document.getElementById('registerFields').style.display = 'block';
     document.getElementById('roleScreen').style.display = 'none';
     document.getElementById('registerScreen').style.display = 'flex';
+  });
+
+  // BORRAR SESIÓN DESDE LA PANTALLA DE REGISTRO
+  document.getElementById('btnResetRegister').addEventListener('click', () => {
+    localStorage.clear();
+    document.getElementById('detectedAccount').style.display = 'none';
+    document.getElementById('registerFields').style.display = 'block';
+    document.getElementById('studentName').value = "";
+    document.getElementById('studentCourse').value = "";
+    document.getElementById('studentList').value = "";
   });
 
   document.getElementById('backToRoles').addEventListener('click', () => {
@@ -162,6 +218,13 @@
   });
 
   document.getElementById('btnEnter').addEventListener('click', async () => {
+    // Si ya estaba pre-registrado, entra directo
+    const savedName = localStorage.getItem('student_name');
+    if (savedName) {
+      window.location.href = "estudiante.html";
+      return;
+    }
+
     const nombre = document.getElementById('studentName').value.trim();
     const curso  = document.getElementById('studentCourse').value;
     const lista  = document.getElementById('studentList').value.trim();
@@ -174,7 +237,6 @@
     const userIdLog = `alumno_${lista}_${nombre.replace(/\s+/g, '_')}`;
     const asistenciaIdLog = `asist_${Date.now()}_${lista}`;
 
-    // Guardar asistencia y estado en Firebase antes de irse
     try {
       await setDoc(doc(db, 'usuarios', userIdLog), { nombre, rol: 'alumno', curso, numLista: lista, estado: 'online' }, { merge: true });
       await setDoc(doc(db, 'asistencia', asistenciaIdLog), { nombre, rol: 'alumno', curso, numLista: lista, entrada: serverTimestamp(), salida: null });
@@ -185,7 +247,6 @@
       localStorage.setItem('student_course', curso);
       localStorage.setItem('student_list', lista);
       
-      // REDIRECCIÓN MÁGICA HACIA LA PÁGINA CORRECTA
       window.location.href = "estudiante.html";
     } catch (e) {
       alert("Hubo un problema al conectar con el servidor.");
