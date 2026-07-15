@@ -44,16 +44,23 @@
     }
 
     .back-link {
-      color: #4f46e5 !important;
+      color: #ef4444 !important;
       text-decoration: none !important;
-      font-weight: 500 !important;
-      font-size: 0.95rem !important;
+      font-weight: 600 !important;
+      font-size: 0.9rem !important;
       display: inline-flex !important;
       align-items: center !important;
-      gap: 0.5rem !important;
+      gap: 0.4rem !important;
+      cursor: pointer !important;
     }
     
-    .app-header h1 { font-size: 1.2rem !important; font-weight: 700 !important; margin: 0 !important; color: #111827 !important; display: block !important; }
+    .app-header h1 { font-size: 1.1rem !important; font-weight: 700 !important; margin: 0 !important; color: #111827 !important; }
+    
+    .student-info-sub {
+      font-size: 0.75rem !important;
+      color: #6b7280 !important;
+      margin-top: 0.2rem !important;
+    }
 
     .badge-student {
       background: #d1fae5 !important;
@@ -90,7 +97,7 @@
       white-space: nowrap !important;
       border-bottom: 1px solid #e5e7eb !important;
       position: sticky !important;
-      top: 65px !important;
+      top: 73px !important;
       z-index: 1900 !important;
       visibility: visible !important;
       opacity: 1 !important;
@@ -180,9 +187,11 @@
 <div class="app-layout">
 
   <header class="app-header">
-    <a href="index.html" class="back-link">← Inicio</a>
-    <h1>Mi Clase</h1>
-    <span class="badge-student">Estudiante</span>
+    <span class="back-link" id="btnLogout">🚪 Salir</span>
+    <div>
+      <h1 id="headerWelcome">Hola, Estudiante</h1>
+      <div class="student-info-sub" id="headerMeta">Cargando datos...</div>
+    </div>
     <div class="status-indicator" id="statusIndicator">
       <span class="status-dot" id="dot"></span><span id="statusText">Conectando...</span>
     </div>
@@ -216,7 +225,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, orderBy, query, limit }
+  import { getFirestore, collection, onSnapshot, orderBy, query, limit, doc, setDoc, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -231,6 +240,18 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
+  // VALIDACIÓN DE SEGURIDAD: SI NO SE HA REGISTRADO, VOLVER A LA PORTADA
+  const savedName = localStorage.getItem('student_name');
+  const savedCourse = localStorage.getItem('student_course');
+  const savedList = localStorage.getItem('student_list');
+
+  if (!savedName || !savedCourse || !savedList) {
+    window.location.href = "index.html";
+  } else {
+    document.getElementById('headerWelcome').textContent = `Hola, ${savedName.split(' ')[0]} 👋`;
+    document.getElementById('headerMeta').textContent = `${savedCourse} | N° Lista: ${savedList}`;
+  }
+
   const feed        = document.getElementById('feed');
   const statusText  = document.getElementById('statusText');
   const dot         = document.getElementById('dot');
@@ -243,7 +264,27 @@
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
 
-  // Intentar solicitar permiso nativo al iniciar
+  // BOTÓN DE CERRAR SESIÓN (VOLVER A EMPEZAR DESDE CERO)
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    const confirmacion = confirm("¿Quieres cerrar sesión y registrar otro estudiante de cero?");
+    if (confirmacion) {
+      const uId = localStorage.getItem('user_log_id');
+      const aId = localStorage.getItem('asist_log_id');
+
+      // Avisar a Firebase que sale
+      if (uId && aId) {
+        try {
+          await setDoc(doc(db, 'usuarios', uId), { estado: 'offline' }, { merge: true });
+          await setDoc(doc(db, 'asistencia', aId), { salida: serverTimestamp() }, { merge: true });
+        } catch(e) {}
+      }
+
+      // Limpiar memoria y redirigir
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  });
+
   try {
     if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission();
