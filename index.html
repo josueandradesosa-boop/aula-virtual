@@ -9,7 +9,6 @@
   <style>
     body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; color: #1f2937; margin: 0; padding: 0; }
     
-    /* Pantalla de Selección de Rol Inicial */
     .role-screen {
       position: fixed; inset: 0;
       background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%);
@@ -46,7 +45,6 @@
     }
     .admin-secret-link:hover { color: #9ca3af; }
 
-    /* Pantalla de Registro de Alumno */
     .register-screen {
       position: fixed; inset: 0;
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -75,7 +73,6 @@
     .btn-enter:hover { transform: translateY(-2px); }
     .btn-back { display: block; margin-top: 1rem; color: #6b7280; text-decoration: none; font-size: 0.85rem; cursor: pointer; }
 
-    /* Estilos para el aviso de cuenta detectada */
     .detected-account-box {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -183,26 +180,22 @@
     window.location.href = "profesor.html";
   });
 
-  // AL HACER CLIC EN ESTUDIANTE
   document.getElementById('chooseStudent').addEventListener('click', () => {
     const savedName = localStorage.getItem('student_name');
     const savedCourse = localStorage.getItem('student_course');
     const savedList = localStorage.getItem('student_list');
 
-    // Si ya tiene datos guardados, entra directo sin preguntar
     if (savedName && savedCourse && savedList) {
       window.location.href = "estudiante.html";
       return;
     }
 
-    // Si no tiene datos, muestra el formulario limpio
     document.getElementById('detectedAccount').style.display = 'none';
     document.getElementById('registerFields').style.display = 'block';
     document.getElementById('roleScreen').style.display = 'none';
     document.getElementById('registerScreen').style.display = 'flex';
   });
 
-  // BORRAR SESIÓN DESDE LA PANTALLA DE REGISTRO
   document.getElementById('btnResetRegister').addEventListener('click', () => {
     localStorage.clear();
     document.getElementById('detectedAccount').style.display = 'none';
@@ -218,7 +211,6 @@
   });
 
   document.getElementById('btnEnter').addEventListener('click', async () => {
-    // Si ya estaba pre-registrado, entra directo
     const savedName = localStorage.getItem('student_name');
     if (savedName) {
       window.location.href = "estudiante.html";
@@ -238,7 +230,15 @@
     const asistenciaIdLog = `asist_${Date.now()}_${lista}`;
 
     try {
-      await setDoc(doc(db, 'usuarios', userIdLog), { nombre, rol: 'alumno', curso, numLista: lista, estado: 'online' }, { merge: true });
+      await setDoc(doc(db, 'usuarios', userIdLog), { 
+        nombre, 
+        rol: 'alumno', 
+        curso, 
+        numLista: lista, 
+        estado: 'online',
+        ultimaActividad: serverTimestamp() 
+      }, { merge: true });
+      
       await setDoc(doc(db, 'asistencia', asistenciaIdLog), { nombre, rol: 'alumno', curso, numLista: lista, entrada: serverTimestamp(), salida: null });
       
       localStorage.setItem('user_log_id', userIdLog);
