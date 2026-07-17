@@ -56,7 +56,7 @@
     }
 
     /* Pantallas contenedoras */
-    .role-screen, .register-screen {
+    .role-screen, .register-screen, .admin-screen {
       width: 100% !important;
       max-width: 440px !important;
       display: flex !important;
@@ -65,13 +65,13 @@
       z-index: 10 !important;
     }
 
-    /* Ocultar inicialmente la pantalla de registro por CSS */
-    .register-screen {
+    /* Ocultar inicialmente las pantallas secundarias */
+    .register-screen, .admin-screen {
       display: none !important;
     }
 
     /* Tarjetas principales de contenido */
-    .role-box, .register-box {
+    .role-box, .register-box, .admin-box {
       background: rgba(255, 255, 255, 0.94) !important;
       backdrop-filter: blur(10px) !important;
       -webkit-backdrop-filter: blur(10px) !important;
@@ -83,14 +83,14 @@
       text-align: center !important;
     }
 
-    .role-box h2, .register-box h2 {
+    .role-box h2, .register-box h2, .admin-box h2 {
       font-size: 1.8rem !important;
       color: #0f172a !important;
       margin: 0 0 0.5rem 0 !important;
       font-weight: 700 !important;
     }
 
-    .role-box p, .register-box p {
+    .role-box p, .register-box p, .admin-box p {
       color: #475569 !important;
       font-size: 0.9rem !important;
       margin: 0 0 2rem 0 !important;
@@ -176,11 +176,12 @@
       font-size: 0.85rem !important;
       font-weight: 500 !important;
       transition: color 0.2s !important;
+      cursor: pointer !important;
     }
     .admin-secret-link:hover { color: #4f46e5 !important; }
 
-    /* Inputs del formulario de registro */
-    .register-box input, .register-box select {
+    /* Inputs y selects */
+    .register-box input, .register-box select, .admin-box input {
       width: 100% !important;
       box-sizing: border-box !important;
       background: #f8fafc !important;
@@ -190,11 +191,15 @@
       font-family: 'Poppins', sans-serif !important;
       font-size: 0.95rem !important;
       outline: none !important;
-      margin-bottom: 1rem !important;
+      margin-bottom: 1.2rem !important;
       color: #0f172a !important;
     }
-    .register-box input:focus, .register-box select:focus { border-color: #3b82f6 !important; background: white !important; }
+    .register-box input:focus, .register-box select:focus, .admin-box input:focus { 
+      border-color: #3b82f6 !important; 
+      background: white !important; 
+    }
 
+    /* Botones primarios */
     .btn-enter {
       width: 100% !important;
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
@@ -206,8 +211,26 @@
       font-weight: 600 !important;
       cursor: pointer !important;
       box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3) !important;
+      transition: all 0.2s ease !important;
     }
-    .btn-back { display: block !important; margin-top: 1rem !important; color: #64748b !important; text-decoration: none !important; font-size: 0.85rem !important; cursor: pointer !important; }
+    .btn-enter:hover {
+      opacity: 0.95 !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-enter-admin {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%) !important;
+      box-shadow: 0 10px 15px -3px rgba(49, 46, 129, 0.3) !important;
+    }
+
+    .btn-back { 
+      display: block !important; 
+      margin-top: 1rem !important; 
+      color: #64748b !important; 
+      text-decoration: none !important; 
+      font-size: 0.85rem !important; 
+      cursor: pointer !important; 
+    }
 
     .detected-account-box {
       background: #eff6ff !important;
@@ -250,7 +273,7 @@
       </button>
     </div>
 
-    <a href="admin.html" class="admin-secret-link"><i class="fa-solid fa-gear"></i> Panel de Control</a>
+    <span class="admin-secret-link" id="goAdmin"><i class="fa-solid fa-gear"></i> Panel de Control</span>
   </div>
 </div>
 
@@ -287,6 +310,19 @@
   </div>
 </div>
 
+<div class="admin-screen" id="adminScreen">
+  <div class="admin-box">
+    <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; color: #1e1b4b; margin-bottom: 1.2rem;"></i>
+    <h2>Acceso Administrador</h2>
+    <p>Ingresa la clave maestra para gestionar el aula</p>
+
+    <input type="password" id="adminPassword" placeholder="Contraseña de Administrador" autocomplete="off" />
+    
+    <button class="btn-enter btn-enter-admin" id="btnEnterAdmin">Verificar Clave</button>
+    <span class="btn-back" id="backToRolesFromAdmin"><i class="fa-solid fa-arrow-left"></i> Volver atrás</span>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, setDoc, serverTimestamp } 
@@ -304,10 +340,12 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
+  // Redirección directa para profesores
   document.getElementById('chooseTeacher').addEventListener('click', () => {
     window.location.href = "profesor.html";
   });
 
+  // Mostrar el Registro del Alumno
   document.getElementById('chooseStudent').addEventListener('click', () => {
     const savedName = localStorage.getItem('student_name');
     const savedCourse = localStorage.getItem('student_course');
@@ -324,6 +362,48 @@
     document.getElementById('registerScreen').style.setProperty('display', 'flex', 'important');
   });
 
+  // Mostrar el Login de Administrador
+  document.getElementById('goAdmin').addEventListener('click', () => {
+    document.getElementById('roleScreen').style.setProperty('display', 'none', 'important');
+    document.getElementById('adminScreen').style.setProperty('display', 'flex', 'important');
+    document.getElementById('adminPassword').value = "";
+    document.getElementById('adminPassword').focus();
+  });
+
+  // Botón de Volver Atrás desde Alumno
+  document.getElementById('backToRoles').addEventListener('click', () => {
+    document.getElementById('registerScreen').style.setProperty('display', 'none', 'important');
+    document.getElementById('roleScreen').style.setProperty('display', 'flex', 'important');
+  });
+
+  // Botón de Volver Atrás desde Administrador
+  document.getElementById('backToRolesFromAdmin').addEventListener('click', () => {
+    document.getElementById('adminScreen').style.setProperty('display', 'none', 'important');
+    document.getElementById('roleScreen').style.setProperty('display', 'flex', 'important');
+  });
+
+  // Validar clave de administrador (Aquí pones tu contraseña secreta)
+  document.getElementById('btnEnterAdmin').addEventListener('click', () => {
+    const password = document.getElementById('adminPassword').value;
+    
+    // CAMBIA AQUÍ "admin123" POR LA CONTRASEÑA QUE QUIERAS USAR
+    if (password === "admin123") {
+      // Guarda la credencial temporalmente (sólo dura mientras la pestaña esté abierta)
+      sessionStorage.setItem('admin_verified', 'true');
+      window.location.href = "admin.html";
+    } else {
+      alert("❌ Contraseña incorrecta. Acceso denegado.");
+    }
+  });
+
+  // Enviar contraseña también con la tecla Enter
+  document.getElementById('adminPassword').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      document.getElementById('btnEnterAdmin').click();
+    }
+  });
+
+  // Borrar registros guardados de alumnos
   document.getElementById('btnResetRegister').addEventListener('click', () => {
     localStorage.clear();
     document.getElementById('detectedAccount').style.display = 'none';
@@ -333,11 +413,7 @@
     document.getElementById('studentList').value = "";
   });
 
-  document.getElementById('backToRoles').addEventListener('click', () => {
-    document.getElementById('registerScreen').style.setProperty('display', 'none', 'important');
-    document.getElementById('roleScreen').style.setProperty('display', 'flex', 'important');
-  });
-
+  // Registrar e ingresar alumno
   document.getElementById('btnEnter').addEventListener('click', async () => {
     const savedName = localStorage.getItem('student_name');
     if (savedName) {
