@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   
   <style>
-    /* DISEÑO INDEPENDIENTE ULTRA REFORZADO PARA LA PORTADA */
+    /* DISEÑO PREMIUM Y ADAPTABLE PARA LA PORTADA */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -36,7 +36,7 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Globos decorativos en el fondo */
+    /* Globos flotantes decorativos en el fondo */
     .p-globo {
       position: absolute !important;
       border-radius: 50% !important;
@@ -47,12 +47,12 @@
       pointer-events: none !important;
       z-index: 1 !important;
     }
-    .g1 { width: 150px !important; height: 150px !important; top: 10% !important; left: 10% !important; }
-    .g2 { width: 250px !important; height: 250px !important; bottom: 5% !important; right: -5% !important; animation-delay: 2s !important; }
+    .g1 { width: 140px !important; height: 140px !important; top: 10% !important; left: 10% !important; }
+    .g2 { width: 220px !important; height: 220px !important; bottom: 5% !important; right: -5% !important; animation-delay: 2s !important; }
 
     @keyframes portFlotar {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
+      50% { transform: translateY(-15px); }
     }
 
     /* Pantallas contenedoras */
@@ -65,7 +65,12 @@
       z-index: 10 !important;
     }
 
-    /* La tarjeta blanca principal estilo cristalizado */
+    /* Ocultar inicialmente la pantalla de registro por CSS */
+    .register-screen {
+      display: none !important;
+    }
+
+    /* Tarjetas principales de contenido */
     .role-box, .register-box {
       background: rgba(255, 255, 255, 0.94) !important;
       backdrop-filter: blur(10px) !important;
@@ -91,7 +96,7 @@
       margin: 0 0 2rem 0 !important;
     }
 
-    /* Contenedor de opciones */
+    /* Opciones de rol */
     .role-options {
       display: flex !important;
       flex-direction: column !important;
@@ -99,7 +104,7 @@
       width: 100% !important;
     }
 
-    /* BOTONES CONFIGURADOS DESDE CERO */
+    /* BOTONES DE LA PORTADA */
     .port-btn {
       display: flex !important;
       align-items: center !important;
@@ -162,7 +167,7 @@
       line-height: 1.3 !important;
     }
 
-    /* Enlace secreto */
+    /* Enlace del panel de control */
     .admin-secret-link {
       display: inline-block !important;
       margin-top: 1.8rem !important;
@@ -249,7 +254,7 @@
   </div>
 </div>
 
-<div class="register-screen" id="registerScreen" style="display: none;">
+<div class="register-screen" id="registerScreen">
   <div class="register-box">
     <i class="fa-solid fa-graduation-cap" style="font-size: 2.5rem; color: #3b82f6; margin-bottom: 1rem;"></i>
     <h2>Identificación de Alumno</h2>
@@ -315,8 +320,8 @@
 
     document.getElementById('detectedAccount').style.display = 'none';
     document.getElementById('registerFields').style.display = 'block';
-    document.getElementById('roleScreen').style.display = 'none';
-    document.getElementById('registerScreen').style.display = 'flex';
+    document.getElementById('roleScreen').style.setProperty('display', 'none', 'important');
+    document.getElementById('registerScreen').style.setProperty('display', 'flex', 'important');
   });
 
   document.getElementById('btnResetRegister').addEventListener('click', () => {
@@ -329,8 +334,8 @@
   });
 
   document.getElementById('backToRoles').addEventListener('click', () => {
-    document.getElementById('registerScreen').style.display = 'none';
-    document.getElementById('roleScreen').style.display = 'flex';
+    document.getElementById('registerScreen').style.setProperty('display', 'none', 'important');
+    document.getElementById('roleScreen').style.setProperty('display', 'flex', 'important');
   });
 
   document.getElementById('btnEnter').addEventListener('click', async () => {
