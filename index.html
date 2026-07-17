@@ -3,94 +3,224 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aula Virtual – Acceso Principal</title>
+  <title>Aula Virtual – Acceso Premium</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="style.css" />
   
   <style>
-    /* Estilos decorativos exclusivos para la portada */
+    /* DISEÑO INDEPENDIENTE ULTRA REFORZADO PARA LA PORTADA */
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+    }
+
     body {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%) !important;
-      position: relative;
-      overflow: hidden;
+      font-family: 'Poppins', sans-serif !important;
+      background: linear-gradient(-45deg, #0f172a, #1e1b4b, #2e1065, #1e1b4b) !important;
+      background-size: 400% 400% !important;
+      animation: portGradiente 12s ease infinite !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative !important;
+      overflow: hidden !important;
+      padding: 1rem !important;
     }
 
-    /* Esferas decorativas de fondo */
-    .decoracion-globo {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      animation: flotarGlobo 8s infinite ease-in-out;
-      pointer-events: none;
-      z-index: 1;
-    }
-    .globo-1 { width: 140px; height: 140px; top: 10%; left: 5%; }
-    .globo-2 { width: 220px; height: 220px; bottom: 8%; right: -5%; animation-delay: 2s; }
-    
-    @keyframes flotarGlobo {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-15px) rotate(10deg); }
+    @keyframes portGradiente {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    /* Caja de selección de roles mejorada (Glassmorphism sutil) */
-    .role-box {
-      background: rgba(255, 255, 255, 0.96) !important;
-      border: 1px solid rgba(255, 255, 255, 0.5) !important;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    /* Globos decorativos en el fondo */
+    .p-globo {
+      position: absolute !important;
+      border-radius: 50% !important;
+      background: rgba(255, 255, 255, 0.03) !important;
+      backdrop-filter: blur(5px) !important;
+      -webkit-backdrop-filter: blur(5px) !important;
+      animation: portFlotar 8s infinite ease-in-out !important;
+      pointer-events: none !important;
+      z-index: 1 !important;
+    }
+    .g1 { width: 150px !important; height: 150px !important; top: 10% !important; left: 10% !important; }
+    .g2 { width: 250px !important; height: 250px !important; bottom: 5% !important; right: -5% !important; animation-delay: 2s !important; }
+
+    @keyframes portFlotar {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Pantallas contenedoras */
+    .role-screen, .register-screen {
+      width: 100% !important;
+      max-width: 440px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 10 !important;
+    }
+
+    /* La tarjeta blanca principal estilo cristalizado */
+    .role-box, .register-box {
+      background: rgba(255, 255, 255, 0.94) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.6) !important;
       border-radius: 28px !important;
-      z-index: 10;
-      position: relative;
-      transition: all 0.3s ease;
+      padding: 2.5rem 2rem !important;
+      width: 100% !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+      text-align: center !important;
     }
 
-    /* Botones con animaciones premium al pasar el mouse */
-    .role-btn {
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-      border: 2px solid #e5e7eb !important;
-      position: relative;
-      overflow: hidden;
+    .role-box h2, .register-box h2 {
+      font-size: 1.8rem !important;
+      color: #0f172a !important;
+      margin: 0 0 0.5rem 0 !important;
+      font-weight: 700 !important;
     }
 
-    .role-btn:hover {
-      transform: translateY(-4px) !important;
+    .role-box p, .register-box p {
+      color: #475569 !important;
+      font-size: 0.9rem !important;
+      margin: 0 0 2rem 0 !important;
+    }
+
+    /* Contenedor de opciones */
+    .role-options {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1rem !important;
+      width: 100% !important;
+    }
+
+    /* BOTONES CONFIGURADOS DESDE CERO */
+    .port-btn {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+      padding: 1.2rem !important;
+      border: 2px solid #e2e8f0 !important;
+      border-radius: 18px !important;
       background: #ffffff !important;
+      cursor: pointer !important;
+      text-align: left !important;
+      width: 100% !important;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
     }
 
-    .role-btn.student-opt:hover {
+    .port-btn:hover {
+      transform: translateY(-4px) !important;
+    }
+
+    .port-btn.student-opt:hover {
       border-color: #3b82f6 !important;
       box-shadow: 0 12px 20px rgba(59, 130, 246, 0.15) !important;
     }
 
-    .role-btn.teacher-opt:hover {
+    .port-btn.teacher-opt:hover {
       border-color: #7c3aed !important;
       box-shadow: 0 12px 20px rgba(124, 58, 237, 0.15) !important;
     }
 
-    /* Animación para agrandar suavemente los iconos de los botones al hacer hover */
-    .role-btn:hover i {
-      transform: scale(1.15);
-      transition: transform 0.3s ease;
+    .port-btn i {
+      font-size: 1.8rem !important;
+      transition: transform 0.3s ease !important;
+      width: 40px !important;
+      text-align: center !important;
+    }
+    .port-btn.student-opt i { color: #3b82f6 !important; }
+    .port-btn.teacher-opt i { color: #7c3aed !important; }
+
+    .port-btn:hover i {
+      transform: scale(1.15) !important;
     }
 
-    /* Enlace de administrador inferior elegante */
+    .btn-text {
+      display: flex !important;
+      flex-direction: column !important;
+      text-align: left !important;
+    }
+
+    .btn-text h3 {
+      margin: 0 !important;
+      font-size: 1.05rem !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+
+    .btn-text p {
+      margin: 0 !important;
+      font-size: 0.8rem !important;
+      color: #64748b !important;
+      line-height: 1.3 !important;
+    }
+
+    /* Enlace secreto */
     .admin-secret-link {
-      transition: all 0.2s ease !important;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
+      display: inline-block !important;
+      margin-top: 1.8rem !important;
+      color: #64748b !important;
+      text-decoration: none !important;
+      font-size: 0.85rem !important;
+      font-weight: 500 !important;
+      transition: color 0.2s !important;
     }
-    .admin-secret-link:hover {
-      color: #4f46e5 !important;
-      background: rgba(79, 70, 229, 0.08);
+    .admin-secret-link:hover { color: #4f46e5 !important; }
+
+    /* Inputs del formulario de registro */
+    .register-box input, .register-box select {
+      width: 100% !important;
+      box-sizing: border-box !important;
+      background: #f8fafc !important;
+      border: 2px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      padding: 0.8rem !important;
+      font-family: 'Poppins', sans-serif !important;
+      font-size: 0.95rem !important;
+      outline: none !important;
+      margin-bottom: 1rem !important;
+      color: #0f172a !important;
     }
+    .register-box input:focus, .register-box select:focus { border-color: #3b82f6 !important; background: white !important; }
+
+    .btn-enter {
+      width: 100% !important;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 12px !important;
+      padding: 0.9rem !important;
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3) !important;
+    }
+    .btn-back { display: block !important; margin-top: 1rem !important; color: #64748b !important; text-decoration: none !important; font-size: 0.85rem !important; cursor: pointer !important; }
+
+    .detected-account-box {
+      background: #eff6ff !important;
+      border: 1px solid #bfdbfe !important;
+      border-radius: 12px !important;
+      padding: 1rem !important;
+      margin-bottom: 1.2rem !important;
+      text-align: left !important;
+    }
+    .detected-account-box p { margin: 0 0 0.5rem 0 !important; font-size: 0.8rem !important; color: #1e40af !important; }
+    .detected-account-box strong { color: #1e3a8a !important; display: block !important; font-size: 0.95rem !important; }
+    .btn-reset-register { background: none !important; border: none !important; color: #ef4444 !important; text-decoration: underline !important; font-size: 0.8rem !important; cursor: pointer !important; padding: 0 !important; margin-top: 0.5rem !important; }
   </style>
 </head>
 <body>
 
-<div class="decoracion-globo globo-1"></div>
-<div class="decoracion-globo globo-2"></div>
+<div class="p-globo g1"></div>
+<div class="p-globo g2"></div>
 
 <div class="role-screen" id="roleScreen">
   <div class="role-box">
@@ -98,7 +228,7 @@
     <p>Por favor, selecciona tu rol para ingresar al portal</p>
     
     <div class="role-options">
-      <button class="role-btn student-opt" id="chooseStudent">
+      <button class="port-btn student-opt" id="chooseStudent">
         <i class="fa-solid fa-user-graduate"></i>
         <div class="btn-text">
           <h3>Soy Estudiante</h3>
@@ -106,7 +236,7 @@
         </div>
       </button>
 
-      <button class="role-btn teacher-opt" id="chooseTeacher">
+      <button class="port-btn teacher-opt" id="chooseTeacher">
         <i class="fa-solid fa-user-tie"></i>
         <div class="btn-text">
           <h3>Soy Profesor</h3>
@@ -119,9 +249,9 @@
   </div>
 </div>
 
-<div class="register-screen" id="registerScreen">
+<div class="register-screen" id="registerScreen" style="display: none;">
   <div class="register-box">
-    <i class="fa-solid fa-graduation-cap"></i>
+    <i class="fa-solid fa-graduation-cap" style="font-size: 2.5rem; color: #3b82f6; margin-bottom: 1rem;"></i>
     <h2>Identificación de Alumno</h2>
     <p>Ingresa tus datos reales para pasar asistencia</p>
 
