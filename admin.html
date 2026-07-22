@@ -1,13 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <script>
-    if (sessionStorage.getItem('admin_verified') !== 'true') {
-      alert("⛔ Acceso prohibido. Debes ingresar la contraseña primero.");
-      window.location.href = "index.html";
-    }
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Control – Administración</title>
@@ -50,14 +44,14 @@
     <div class="card-panel">
       <h2><i class="fa-solid fa-users"></i> Alumnos Registrados y Presencia</h2>
       <div id="usersList">
-        <p style="text-align: center; color: #9ca3af;">Cargando lista de alumnos...</p>
+        <p style="text-align: center; color: #9ca3af;">Verificando autenticación...</p>
       </div>
     </div>
     
     <div class="card-panel">
       <h2><i class="fa-solid fa-clock-rotate-left"></i> Registro de Asistencias</h2>
       <div id="attendanceList" style="max-height: 400px; overflow-y: auto; font-size: 0.85rem; color: #4b5563;">
-        <p style="text-align: center; color: #9ca3af;">Cargando historial...</p>
+        <p style="text-align: center; color: #9ca3af;">Verificando autenticación...</p>
       </div>
     </div>
   </div>
@@ -67,6 +61,8 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, onSnapshot, orderBy, query } 
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBynAiyunaie-L49lT_mJ3W7SiQRB9sDVw",
@@ -77,85 +73,95 @@
     appId: "1:734322078138:web:66ddaaab8b05ffe1996d83"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+  const app  = initializeApp(firebaseConfig);
+  const db   = getFirestore(app);
+  const auth = getAuth(app);
 
   const usersList = document.getElementById('usersList');
   const attendanceList = document.getElementById('attendanceList');
 
-  // BOTÓN PARA CERRAR SESIÓN DE MANERA SEGURA
-  document.getElementById('btnAdminLogout').addEventListener('click', () => {
-    sessionStorage.removeItem('admin_verified'); // Destruye la llave de sesión
-    window.location.href = "index.html"; // Envía a la portada
+  // GUARDIÁN DE AUTENTICACIÓN FIREBASE
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      alert("⛔ Acceso prohibido. Debes iniciar sesión como administrador.");
+      window.location.href = "index.html";
+    } else {
+      iniciarPanelAdmin();
+    }
   });
 
-  // ESCUCHAR USUARIOS Y DETERMINAR SU ESTADO DE ACTIVIDAD REAL
-  onSnapshot(collection(db, 'usuarios'), (snapshot) => {
-    if (snapshot.empty) {
-      usersList.innerHTML = `<p style="text-align: center; color: #9ca3af;">No hay alumnos registrados.</p>`;
-      return;
-    }
+  // BOTÓN CERRAR SESIÓN CON FIREBASE AUTH
+  document.getElementById('btnAdminLogout').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
+  });
 
-    usersList.innerHTML = '';
-    const ahora = Date.now();
+  function iniciarPanelAdmin() {
+    // ESCUCHAR USUARIOS
+    onSnapshot(collection(db, 'usuarios'), (snapshot) => {
+      if (snapshot.empty) {
+        usersList.innerHTML = `<p style="text-align: center; color: #9ca3af;">No hay alumnos registrados.</p>`;
+        return;
+      }
 
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      if (d.rol === 'alumno') {
+      usersList.innerHTML = '';
+      const ahora = Date.now();
+
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        if (d.rol === 'alumno') {
+          const row = document.createElement('div');
+          row.className = 'student-row';
+
+          const ultimaConexion = d.ultimaActividad?.toDate ? d.ultimaActividad.toDate().getTime() : 0;
+          const estaActivoRealmente = (ahora - ultimaConexion) < 45000; 
+          const estadoFinal = (d.estado === 'online' && estaActivoRealmente) ? 'online' : 'offline';
+
+          row.innerHTML = `
+            <div class="student-info">
+              <span class="name">${d.nombre}</span>
+              <span class="meta">${d.curso || 'Sin curso'} | Lista N° ${d.numLista || 'N/A'}</span>
+            </div>
+            <span class="status-badge ${estadoFinal}">${estadoFinal}</span>
+          `;
+          usersList.appendChild(row);
+        }
+      });
+    });
+
+    // ESCUCHAR HISTORIAL DE ASISTENCIA
+    const qAsist = query(collection(db, 'asistencia'), orderBy('entrada', 'desc'));
+    onSnapshot(qAsist, (snapshot) => {
+      if (snapshot.empty) {
+        attendanceList.innerHTML = `<p style="text-align: center; color: #9ca3af;">No hay registros de asistencia hoy.</p>`;
+        return;
+      }
+
+      attendanceList.innerHTML = '';
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        let entradaStr = 'N/A';
+        let salidaStr  = 'En clase';
+
+        if (d.entrada?.toDate) {
+          entradaStr = d.entrada.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
+        }
+        if (d.salida?.toDate) {
+          salidaStr = d.salida.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
+        }
+
         const row = document.createElement('div');
-        row.className = 'student-row';
-
-        // Obtener la fecha del último latido de actividad
-        const ultimaConexion = d.ultimaActividad?.toDate ? d.ultimaActividad.toDate().getTime() : 0;
-        
-        // FILTRO DE INACTIVIDAD: si pasaron más de 45 segundos, se considera Offline de verdad
-        const estaActivoRealmente = (ahora - ultimaConexion) < 45000; 
-        const estadoFinal = (d.estado === 'online' && estaActivoRealmente) ? 'online' : 'offline';
-
+        row.style.padding = '0.5rem 0';
+        row.style.borderBottom = '1px dashed #e5e7eb';
         row.innerHTML = `
-          <div class="student-info">
-            <span class="name">${d.nombre}</span>
-            <span class="meta">${d.curso || 'Sin curso'} | Lista N° ${d.numLista || 'N/A'}</span>
-          </div>
-          <span class="status-badge ${estadoFinal}">${estadoFinal}</span>
+          <strong>${d.nombre}</strong> (${d.curso})<br/>
+          <span style="color:#10b981;">▶ Entró: ${entradaStr}</span> | 
+          <span style="color:#ef4444;">■ Salió: ${salidaStr}</span>
         `;
-        usersList.appendChild(row);
-      }
+        attendanceList.appendChild(row);
+      });
     });
-  });
-
-  // ESCUCHAR HISTORIAL DE ASISTENCIA
-  const qAsist = query(collection(db, 'asistencia'), orderBy('entrada', 'desc'));
-  onSnapshot(qAsist, (snapshot) => {
-    if (snapshot.empty) {
-      attendanceList.innerHTML = `<p style="text-align: center; color: #9ca3af;">No hay registros de asistencia hoy.</p>`;
-      return;
-    }
-
-    attendanceList.innerHTML = '';
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      let entradaStr = 'N/A';
-      let salidaStr  = 'En clase';
-
-      if (d.entrada?.toDate) {
-        entradaStr = d.entrada.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
-      }
-      if (d.salida?.toDate) {
-        salidaStr = d.salida.toDate().toLocaleTimeString('es', {hour: '2-digit', minute:'2-digit'});
-      }
-
-      const row = document.createElement('div');
-      row.style.padding = '0.5rem 0';
-      row.style.borderBottom = '1px dashed #e5e7eb';
-      row.innerHTML = `
-        <strong>${d.nombre}</strong> (${d.curso})<br/>
-        <span style="color:#10b981;">▶ Entró: ${entradaStr}</span> | 
-        <span style="color:#ef4444;">■ Salió: ${salidaStr}</span>
-      `;
-      attendanceList.appendChild(row);
-    });
-  });
+  }
 </script>
 </body>
 </html>
