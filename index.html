@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   
   <style>
-    /* DISEÑO PREMIUM Y ADAPTABLE PARA LA PORTADA */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -36,7 +35,6 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Globos flotantes decorativos en el fondo */
     .p-globo {
       position: absolute !important;
       border-radius: 50% !important;
@@ -55,7 +53,6 @@
       50% { transform: translateY(-15px); }
     }
 
-    /* Pantallas contenedoras */
     .role-screen, .register-screen, .admin-screen {
       width: 100% !important;
       max-width: 440px !important;
@@ -65,12 +62,10 @@
       z-index: 10 !important;
     }
 
-    /* Ocultar inicialmente las pantallas secundarias */
     .register-screen, .admin-screen {
       display: none !important;
     }
 
-    /* Tarjetas principales de contenido */
     .role-box, .register-box, .admin-box {
       background: rgba(255, 255, 255, 0.94) !important;
       backdrop-filter: blur(10px) !important;
@@ -96,7 +91,6 @@
       margin: 0 0 2rem 0 !important;
     }
 
-    /* Opciones de rol */
     .role-options {
       display: flex !important;
       flex-direction: column !important;
@@ -104,7 +98,6 @@
       width: 100% !important;
     }
 
-    /* BOTONES DE LA PORTADA */
     .port-btn {
       display: flex !important;
       align-items: center !important;
@@ -167,7 +160,6 @@
       line-height: 1.3 !important;
     }
 
-    /* Enlace del panel de control */
     .admin-secret-link {
       display: inline-block !important;
       margin-top: 1.8rem !important;
@@ -180,7 +172,6 @@
     }
     .admin-secret-link:hover { color: #4f46e5 !important; }
 
-    /* Inputs y selects */
     .register-box input, .register-box select, .admin-box input {
       width: 100% !important;
       box-sizing: border-box !important;
@@ -191,7 +182,7 @@
       font-family: 'Poppins', sans-serif !important;
       font-size: 0.95rem !important;
       outline: none !important;
-      margin-bottom: 1.2rem !important;
+      margin-bottom: 1rem !important;
       color: #0f172a !important;
     }
     .register-box input:focus, .register-box select:focus, .admin-box input:focus { 
@@ -199,7 +190,6 @@
       background: white !important; 
     }
 
-    /* Botones primarios */
     .btn-enter {
       width: 100% !important;
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
@@ -314,11 +304,12 @@
   <div class="admin-box">
     <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; color: #1e1b4b; margin-bottom: 1.2rem;"></i>
     <h2>Acceso Administrador</h2>
-    <p>Ingresa la clave maestra para gestionar el aula</p>
+    <p>Ingresa tu correo y contraseña registrados</p>
 
-    <input type="password" id="adminPassword" placeholder="Contraseña de Administrador" autocomplete="off" />
+    <input type="email" id="adminEmail" placeholder="Correo del Administrador" autocomplete="off" />
+    <input type="password" id="adminPassword" placeholder="Contraseña" autocomplete="off" />
     
-    <button class="btn-enter btn-enter-admin" id="btnEnterAdmin">Verificar Clave</button>
+    <button class="btn-enter btn-enter-admin" id="btnEnterAdmin">Iniciar Sesión</button>
     <span class="btn-back" id="backToRolesFromAdmin"><i class="fa-solid fa-arrow-left"></i> Volver atrás</span>
   </div>
 </div>
@@ -327,6 +318,8 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, setDoc, serverTimestamp } 
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBynAiyunaie-L49lT_mJ3W7SiQRB9sDVw",
@@ -337,15 +330,14 @@
     appId: "1:734322078138:web:66ddaaab8b05ffe1996d83"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+  const app  = initializeApp(firebaseConfig);
+  const db   = getFirestore(app);
+  const auth = getAuth(app);
 
-  // Redirección directa para profesores
   document.getElementById('chooseTeacher').addEventListener('click', () => {
     window.location.href = "profesor.html";
   });
 
-  // Mostrar el Registro del Alumno
   document.getElementById('chooseStudent').addEventListener('click', () => {
     const savedName = localStorage.getItem('student_name');
     const savedCourse = localStorage.getItem('student_course');
@@ -362,58 +354,45 @@
     document.getElementById('registerScreen').style.setProperty('display', 'flex', 'important');
   });
 
-  // Mostrar el Login de Administrador
   document.getElementById('goAdmin').addEventListener('click', () => {
     document.getElementById('roleScreen').style.setProperty('display', 'none', 'important');
     document.getElementById('adminScreen').style.setProperty('display', 'flex', 'important');
-    document.getElementById('adminPassword').value = "";
-    document.getElementById('adminPassword').focus();
   });
 
-  // Botón de Volver Atrás desde Alumno
   document.getElementById('backToRoles').addEventListener('click', () => {
     document.getElementById('registerScreen').style.setProperty('display', 'none', 'important');
     document.getElementById('roleScreen').style.setProperty('display', 'flex', 'important');
   });
 
-  // Botón de Volver Atrás desde Administrador
   document.getElementById('backToRolesFromAdmin').addEventListener('click', () => {
     document.getElementById('adminScreen').style.setProperty('display', 'none', 'important');
     document.getElementById('roleScreen').style.setProperty('display', 'flex', 'important');
   });
 
-  // Validar clave de administrador (Aquí pones tu contraseña secreta)
-  document.getElementById('btnEnterAdmin').addEventListener('click', () => {
+  // INICIO DE SESIÓN DE ADMINISTRADOR MEDIANTE FIREBASE AUTH
+  document.getElementById('btnEnterAdmin').addEventListener('click', async () => {
+    const email = document.getElementById('adminEmail').value.trim();
     const password = document.getElementById('adminPassword').value;
-    
-    // CAMBIA AQUÍ "admin123" POR LA CONTRASEÑA QUE QUIERAS USAR
-    if (password === "admin123") {
-      // Guarda la credencial temporalmente (sólo dura mientras la pestaña esté abierta)
-      sessionStorage.setItem('admin_verified', 'true');
+
+    if (!email || !password) {
+      alert("⚠️ Ingresa tu correo y contraseña.");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       window.location.href = "admin.html";
-    } else {
-      alert("❌ Contraseña incorrecta. Acceso denegado.");
+    } catch (error) {
+      alert("❌ Credenciales incorrectas o usuario no encontrado.");
     }
   });
 
-  // Enviar contraseña también con la tecla Enter
-  document.getElementById('adminPassword').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      document.getElementById('btnEnterAdmin').click();
-    }
-  });
-
-  // Borrar registros guardados de alumnos
   document.getElementById('btnResetRegister').addEventListener('click', () => {
     localStorage.clear();
     document.getElementById('detectedAccount').style.display = 'none';
     document.getElementById('registerFields').style.display = 'block';
-    document.getElementById('studentName').value = "";
-    document.getElementById('studentCourse').value = "";
-    document.getElementById('studentList').value = "";
   });
 
-  // Registrar e ingresar alumno
   document.getElementById('btnEnter').addEventListener('click', async () => {
     const savedName = localStorage.getItem('student_name');
     if (savedName) {
