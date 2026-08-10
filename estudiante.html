@@ -62,31 +62,19 @@
       margin-top: 0.2rem !important;
     }
 
-    .badge-student {
-      background: #d1fae5 !important;
-      color: #065f46 !important;
-      padding: 0.25rem 0.75rem !important;
-      border-radius: 9999px !important;
-      font-size: 0.8rem !important;
-      font-weight: 600 !important;
-      display: inline-block !important;
-    }
-
-    .status-indicator {
+    .points-header-box {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+      border: 1px solid #f59e0b !important;
+      color: #b45309 !important;
+      padding: 0.4rem 0.8rem !important;
+      border-radius: 12px !important;
+      font-weight: 700 !important;
+      font-size: 0.9rem !important;
       display: flex !important;
       align-items: center !important;
       gap: 0.4rem !important;
-      font-size: 0.8rem !important;
-      color: #6b7280 !important;
+      box-shadow: 0 2px 4px rgba(245, 158, 11, 0.15) !important;
     }
-    .status-dot {
-      width: 8px !important;
-      height: 8px !important;
-      background-color: #d1d5db !important;
-      border-radius: 50% !important;
-      display: inline-block !important;
-    }
-    .status-dot.online { background-color: #10b981 !important; box-shadow: 0 0 8px #10b981 !important; }
 
     .filter-container {
       background: white !important;
@@ -165,6 +153,8 @@
       justify-content: space-between !important;
       align-items: center !important;
       margin-bottom: 0.75rem !important;
+      flex-wrap: wrap !important;
+      gap: 0.4rem !important;
     }
     .post-meta .author { font-weight: 600 !important; color: #374151 !important; display: flex !important; align-items: center !important; gap: 0.4rem !important; }
     
@@ -177,9 +167,37 @@
       font-weight: 600 !important;
     }
 
+    .reward-box {
+      background: #fffbeb !important;
+      border: 1px solid #fcd34d !important;
+      border-radius: 12px !important;
+      padding: 0.8rem 1rem !important;
+      margin-top: 1rem !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
+    .claim-btn {
+      background: #f59e0b !important;
+      color: white !important;
+      border: none !important;
+      padding: 0.5rem 1rem !important;
+      border-radius: 8px !important;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      cursor: pointer !important;
+      transition: background 0.2s !important;
+    }
+    .claim-btn:hover { background: #d97706 !important; }
+    .claim-btn.done {
+      background: #10b981 !important;
+      cursor: default !important;
+    }
+
     .post-text { font-size: 0.98rem !important; line-height: 1.5 !important; color: #4b5563 !important; margin: 0 0 1rem 0 !important; white-space: pre-wrap !important; }
-    .post-img { width: 100% !important; max-height: 300px !important; object-fit: cover !important; border-radius: 12px !important; }
-    .file-attach-link { display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; color: #4f46e5 !important; font-weight: 500 !important; text-decoration: none !important; }
+    .post-img { width: 100% !important; max-height: 300px !important; object-fit: cover !important; border-radius: 12px !important; margin-bottom: 0.5rem !important; }
+    .file-attach-link { display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; color: #4f46e5 !important; font-weight: 500 !important; text-decoration: none !important; margin-top: 0.5rem !important; }
   </style>
 </head>
 <body>
@@ -192,8 +210,9 @@
       <h1 id="headerWelcome">Hola, Estudiante</h1>
       <div class="student-info-sub" id="headerMeta">Cargando datos...</div>
     </div>
-    <div class="status-indicator" id="statusIndicator">
-      <span class="status-dot" id="dot"></span><span id="statusText">Conectando...</span>
+    
+    <div class="points-header-box" id="userPointsBox">
+      ⭐ <span id="userPointsCount">0</span> pts
     </div>
   </header>
 
@@ -225,7 +244,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, orderBy, query, limit, doc, setDoc, serverTimestamp }
+  import { getFirestore, collection, onSnapshot, orderBy, query, limit, doc, setDoc, updateDoc, increment, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -240,12 +259,12 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  // VALIDACIÓN DE SEGURIDAD: SI NO SE HA REGISTRADO, VOLVER A LA PORTADA
   const savedName = localStorage.getItem('student_name');
   const savedCourse = localStorage.getItem('student_course');
   const savedList = localStorage.getItem('student_list');
+  const userId = localStorage.getItem('user_log_id');
 
-  if (!savedName || !savedCourse || !savedList) {
+  if (!savedName || !savedCourse || !savedList || !userId) {
     window.location.href = "index.html";
   } else {
     document.getElementById('headerWelcome').textContent = `Hola, ${savedName.split(' ')[0]} 👋`;
@@ -253,57 +272,55 @@
   }
 
   const feed        = document.getElementById('feed');
-  const statusText  = document.getElementById('statusText');
-  const dot         = document.getElementById('dot');
   const newAlert    = document.getElementById('newAlert');
   const alertText   = document.getElementById('alertText');
   const filterContainer = document.getElementById('filterContainer');
+  const userPointsCount = document.getElementById('userPointsCount');
 
   let isFirstLoad = true;
   let knownIds = new Set();
   let todasLasPublicaciones = [];
   let materiaSeleccionada = "Todos";
+  let tareasCompletadas = new Set();
 
-  // ENVIAR LATIDO DE PRESENCIA CADA 20 SEGUNDOS MIENTRAS LA WEB ESTÉ ABIERTA
+  onSnapshot(doc(db, 'usuarios', userId), (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.data();
+      userPointsCount.textContent = data.puntos || 0;
+      if (data.tareasCompletadas) {
+        tareasCompletadas = new Set(data.tareasCompletadas);
+      }
+      renderFeed();
+    }
+  });
+
   setInterval(async () => {
-    const uId = localStorage.getItem('user_log_id');
-    if (uId) {
+    if (userId) {
       try {
-        await setDoc(doc(db, 'usuarios', uId), { 
+        await setDoc(doc(db, 'usuarios', userId), { 
           estado: 'online', 
           ultimaActividad: serverTimestamp() 
         }, { merge: true });
       } catch(e) { console.log(e); }
     }
-  }, 20000); // 20 segundos
+  }, 20000);
 
-  // BOTÓN DE CERRAR SESIÓN
   document.getElementById('btnLogout').addEventListener('click', async () => {
-    const confirmacion = confirm("¿Quieres cerrar sesión y registrar otro estudiante de cero?");
+    const confirmacion = confirm("¿Quieres cerrar sesión?");
     if (confirmacion) {
-      const uId = localStorage.getItem('user_log_id');
       const aId = localStorage.getItem('asist_log_id');
-
-      // Avisar a Firebase que sale colocándolo offline de inmediato
-      if (uId) {
+      if (userId) {
         try {
-          await setDoc(doc(db, 'usuarios', uId), { estado: 'offline', ultimaActividad: null }, { merge: true });
+          await setDoc(doc(db, 'usuarios', userId), { estado: 'offline', ultimaActividad: null }, { merge: true });
           if(aId) {
             await setDoc(doc(db, 'asistencia', aId), { salida: serverTimestamp() }, { merge: true });
           }
         } catch(e) {}
       }
-
       localStorage.clear();
       window.location.href = "index.html";
     }
   });
-
-  try {
-    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-      Notification.requestPermission();
-    }
-  } catch(e) { console.log(e); }
 
   newAlert.addEventListener('click', () => {
     materiaSeleccionada = "Todos";
@@ -325,20 +342,15 @@
   const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
 
   onSnapshot(q, (snapshot) => {
-    if(dot) dot.className = "status-dot online";
-    if(statusText) statusText.textContent = "En línea";
-
     const currentDocs = snapshot.docs;
     let hayNuevas = false;
     let ultimaMateriaNueva = "Generales";
-    let textoCortoNuevo = "";
 
     if (!isFirstLoad) {
       for (let doc of currentDocs) {
         if (!knownIds.has(doc.id)) {
           hayNuevas = true;
           ultimaMateriaNueva = doc.data().materia || "Generales";
-          textoCortoNuevo = doc.data().texto || "";
           break; 
         }
       }
@@ -347,31 +359,18 @@
     knownIds = new Set(currentDocs.map(d => d.id));
     todasLasPublicaciones = currentDocs.map(d => ({ id: d.id, ...d.data() }));
 
-    renderFeed(hayNuevas);
+    renderFeed();
 
-    if (hayNuevas) {
-      if (window.scrollY > 100) {
-        alertText.textContent = `🔔 Nueva tarea en: ${ultimaMateriaNueva}`;
-        newAlert.classList.add('visible');
-        setTimeout(() => newAlert.classList.remove('visible'), 7000);
-      }
-
-      if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-        new Notification(`📢 Nueva tarea: ${ultimaMateriaNueva}`, {
-          body: textoCortoNuevo.substring(0, 60) + "...",
-          icon: "icons/icon-192.png"
-        });
-      }
+    if (hayNuevas && window.scrollY > 100) {
+      alertText.textContent = `🔔 Nueva tarea en: ${ultimaMateriaNueva}`;
+      newAlert.classList.add('visible');
+      setTimeout(() => newAlert.classList.remove('visible'), 7000);
     }
 
     isFirstLoad = false;
-
-  }, (error) => {
-    if(statusText) statusText.textContent = "Error de conexión";
-    console.error(error);
   });
 
-  function renderFeed(resaltarNuevas = false) {
+  function renderFeed() {
     const publicacionesFiltradas = todasLasPublicaciones.filter(p => {
       if (materiaSeleccionada === "Todos") return true;
       return (p.materia || "Generales") === materiaSeleccionada;
@@ -397,6 +396,27 @@
       let mediaHtml = p.archivoUrl ? `<img src="${p.archivoUrl}" class="post-img" alt="Material" onclick="window.open('${p.archivoUrl}', '_blank')"/>` : "";
       let linkHtml = p.archivoUrl ? `<a href="${p.archivoUrl}" target="_blank" class="file-attach-link">⬇️ Descargar Adjunto</a>` : "";
 
+      const cantidadPuntos = parseInt(p.puntos, 10) || 0;
+      let rewardHtml = "";
+
+      if (cantidadPuntos > 0) {
+        const estaCompletada = tareasCompletadas.has(p.id);
+        const btnTexto = estaCompletada ? "✅ Tarea Completada" : "Completar y Reclamar ⭐";
+        const btnClass = estaCompletada ? "claim-btn done" : "claim-btn";
+        const btnDisabled = estaCompletada ? "disabled" : "";
+
+        rewardHtml = `
+          <div class="reward-box">
+            <div>
+              <span style="font-weight:700; color:#b45309; font-size:0.9rem;">⭐ Recompensa: +${cantidadPuntos} Puntos</span>
+            </div>
+            <button class="${btnClass}" ${btnDisabled} onclick="completarTarea('${p.id}', ${cantidadPuntos})">
+              ${btnTexto}
+            </button>
+          </div>
+        `;
+      }
+
       card.innerHTML = `
         <div class="post-meta">
           <span class="author">👤 ${p.autor || 'Profesor'}</span>
@@ -406,10 +426,30 @@
         <p class="post-text">${escapeHTML(p.texto || '')}</p>
         ${mediaHtml}
         ${linkHtml}
+        ${rewardHtml}
       `;
       feed.appendChild(card);
     });
   }
+
+  window.completarTarea = async (tareaId, puntos) => {
+    if (tareasCompletadas.has(tareaId)) return;
+
+    try {
+      const userRef = doc(db, 'usuarios', userId);
+      tareasCompletadas.add(tareaId);
+
+      await updateDoc(userRef, {
+        puntos: increment(puntos),
+        tareasCompletadas: Array.from(tareasCompletadas)
+      });
+
+      alert(`🎉 ¡Felicidades! Has ganado +${puntos} puntos.`);
+    } catch (error) {
+      console.error("Error al reclamar puntos:", error);
+      alert("Hubo un error al procesar tu recompensa.");
+    }
+  };
 
   function escapeHTML(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
