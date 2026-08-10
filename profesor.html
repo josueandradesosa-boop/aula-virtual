@@ -47,13 +47,14 @@
     .badge-teacher { background: #e0e7ff; color: #4f46e5; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
 
     /* Feed de publicaciones */
-    .feed-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; padding-bottom: 340px; }
+    .feed-area { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; padding-bottom: 380px; }
     .post-card { background: white; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #f3f4f6; }
-    .post-meta { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; color: #6b7280; align-items: center; }
+    .post-meta { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.85rem; color: #6b7280; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
     
     /* Etiqueta colorida de la Materia */
     .subject-badge { background: #4f46e5; color: white; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    
+    .points-badge { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; }
+
     .post-text { font-size: 0.98rem; line-height: 1.5; color: #374151; margin-bottom: 0.75rem; white-space: pre-wrap; }
     
     /* Imagen dentro del post */
@@ -62,13 +63,16 @@
     /* Creador de Tareas Fijo Inferior */
     .composer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: white; box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1); border-top: 1px solid #e5e7eb; padding: 1.2rem; box-sizing: border-box; border-radius: 24px 24px 0 0; z-index: 40; }
     
-    /* Estilos del Selector de Materias */
-    .subject-select {
-      width: 100%; box-sizing: border-box; padding: 0.6rem; border: 2px solid #e5e7eb;
-      border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.95rem;
-      margin-bottom: 0.75rem; color: #1f2937; background-color: #f9fafb; outline: none;
+    .composer-inputs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+
+    .subject-select, .points-select {
+      box-sizing: border-box; padding: 0.6rem; border: 2px solid #e5e7eb;
+      border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 0.9rem;
+      color: #1f2937; background-color: #f9fafb; outline: none;
     }
-    .subject-select:focus { border-color: #4f46e5; background-color: white; }
+    .subject-select { flex: 1.5; }
+    .points-select { flex: 1; }
+    .subject-select:focus, .points-select:focus { border-color: #4f46e5; background-color: white; }
 
     .composer textarea { 
       width: 100%; box-sizing: border-box; height: 80px; 
@@ -119,18 +123,28 @@
   </main>
 
   <div class="composer">
-    <select id="subjectSelect" class="subject-select">
-      <option value="Generales">Materia: Avisos Generales</option>
-      <option value="Matemáticas">📐 Matemáticas</option>
-      <option value="Lengua Española">📚 Lengua Española</option>
-      <option value="Ciencias Sociales">🌍 Ciencias Sociales</option>
-      <option value="Ciencias Naturales">🌱 Ciencias Naturales</option>
-      <option value="Cívica">⚖️ Cívica y Formación Humana</option>
-      <option value="Informática">💻 Informática</option>
-      <option value="Artística">🎨 Artística</option>
-      <option value="Inglés">🗣️ Inglés</option>
-      <option value="Francés">🥖 Francés</option>
-    </select>
+    <div class="composer-inputs">
+      <select id="subjectSelect" class="subject-select">
+        <option value="Generales">Materia: Avisos Generales</option>
+        <option value="Matemáticas">📐 Matemáticas</option>
+        <option value="Lengua Española">📚 Lengua Española</option>
+        <option value="Ciencias Sociales">🌍 Ciencias Sociales</option>
+        <option value="Ciencias Naturales">🌱 Ciencias Naturales</option>
+        <option value="Cívica">⚖️ Cívica y Formación Humana</option>
+        <option value="Informática">💻 Informática</option>
+        <option value="Artística">🎨 Artística</option>
+        <option value="Inglés">🗣️ Inglés</option>
+        <option value="Francés">🥖 Francés</option>
+      </select>
+
+      <select id="pointsSelect" class="points-select">
+        <option value="0">Sin Puntos</option>
+        <option value="10">⭐ +10 Pts</option>
+        <option value="25">⭐ +25 Pts</option>
+        <option value="50">⭐ +50 Pts</option>
+        <option value="100">⭐ +100 Pts</option>
+      </select>
+    </div>
 
     <textarea id="msgInput" placeholder="Escribe la tarea o un anuncio aquí..." maxlength="2000" style="color: #000000 !important; background: #ffffff !important;"></textarea>
     
@@ -224,6 +238,7 @@
     const feed = document.getElementById('feed');
     const msgInput = document.getElementById('msgInput');
     const subjectSelect = document.getElementById('subjectSelect');
+    const pointsSelect = document.getElementById('pointsSelect');
     const publishBtn = document.getElementById('publishBtn');
     const toast = document.getElementById('toast');
     const fileInput = document.getElementById('fileInput');
@@ -260,10 +275,12 @@
       }
     });
 
-    // Publicar Tarea con Materia Incluida
+    // Publicar Tarea con Materia y Puntos Incluidos
     publishBtn.addEventListener('click', async () => {
       const text = msgInput.value.trim();
       const materia = subjectSelect.value;
+      const puntos = parseInt(pointsSelect.value) || 0;
+
       if (!text && !urlArchivoAdjunto) { showToast('Escribe algo o sube una foto primero'); return; }
       
       publishBtn.disabled = true;
@@ -272,19 +289,21 @@
         await addDoc(collection(db, 'publicaciones'), { 
           texto: text, 
           autor: 'Profesor', 
-          materia: materia, // Guarda la materia en Firebase
+          materia: materia,
+          puntos: puntos, // Guardamos los puntos de recompensa en Firestore
           archivoUrl: urlArchivoAdjunto, 
           timestamp: serverTimestamp() 
         });
         msgInput.value = ''; urlArchivoAdjunto = ""; previewBox.style.display = "none";
         uploadLabelText.textContent = "Subir Foto"; fileInput.value = "";
-        subjectSelect.value = "Generales"; // Resetea a Avisos Generales
+        subjectSelect.value = "Generales"; 
+        pointsSelect.value = "0"; // Resetea puntos a 0
         showToast('✅ ¡Publicado con éxito!');
       } catch (err) { showToast('Error al publicar'); }
       finally { publishBtn.disabled = false; }
     });
 
-    // Feed en tiempo real con renderizado de materias
+    // Feed en tiempo real con renderizado de materias y puntos
     const q = query(collection(db, 'publicaciones'), orderBy('timestamp', 'desc'), limit(50));
     onSnapshot(q, (snapshot) => {
       if (snapshot.empty) {
@@ -297,14 +316,14 @@
         const card = document.createElement('div'); card.className = 'post-card';
         
         let mediaHtml = d.archivoUrl ? `<img src="${d.archivoUrl}" class="post-img" alt="Material" onclick="window.open('${d.archivoUrl}', '_blank')"/>` : "";
-        
-        // Pone la etiqueta de la materia si existe, si no, por defecto es 'Generales'
         const tagMateria = d.materia ? d.materia : 'Generales';
-        
+        const badgePuntos = d.puntos && d.puntos > 0 ? `<span class="points-badge">⭐ +${d.puntos} pts</span>` : '';
+
         card.innerHTML = `
           <div class="post-meta">
             <span><i class="fa-solid fa-user-tie"></i> ${d.autor}</span>
             <span class="subject-badge">${tagMateria}</span>
+            ${badgePuntos}
             <span><i class="fa-regular fa-clock"></i> ${time}</span>
           </div>
           <p class="post-text">${escapeHTML(d.texto)}</p>
