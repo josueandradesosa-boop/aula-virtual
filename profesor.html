@@ -3,112 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profesor – Aula Virtual</title>
+  <title>Profesor – Aula Virtual Premium</title>
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f3f4f6;
-      color: #1f2937;
-      margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif !important;
+      background-color: #f3f4f6 !important;
+      color: #1f2937 !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
+
     .app-layout {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      min-height: 100vh;
-      box-shadow: 0 0 40px rgba(0,0,0,0.05);
-      padding: 1.5rem;
+      max-width: 600px !important;
+      margin: 0 auto !important;
+      background: #f9fafb !important;
+      min-height: 100vh !important;
+      box-shadow: 0 0 40px rgba(0,0,0,0.05) !important;
+      position: relative !important;
+      display: block !important;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
+
+    .app-header {
+      background: white !important;
+      padding: 1.25rem 1.5rem !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 2000 !important;
     }
-    header h1 { font-size: 1.25rem; font-weight: 700; margin: 0; }
-    .btn-back { color: #ef4444; text-decoration: none; font-weight: 600; }
+
+    .back-link {
+      color: #ef4444 !important;
+      text-decoration: none !important;
+      font-weight: 600 !important;
+      font-size: 0.9rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.4rem !important;
+      cursor: pointer !important;
+    }
     
-    .form-group { margin-bottom: 1rem; }
-    label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem; color: #374151; }
-    input[type="text"], select, textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      box-sizing: border-box;
+    .app-header h1 { font-size: 1.1rem !important; font-weight: 700 !important; margin: 0 !important; color: #111827 !important; }
+
+    .content-area {
+      padding: 1.5rem !important;
     }
-    textarea { height: 100px; resize: vertical; }
-    
-    .btn-submit {
-      width: 100%;
-      background: #4f46e5;
-      color: white;
-      border: none;
-      padding: 0.85rem;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s;
+
+    .card {
+      background: white !important;
+      border-radius: 18px !important;
+      padding: 1.5rem !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid #f3f4f6 !important;
+      margin-bottom: 1.5rem !important;
     }
-    .btn-submit:hover { background: #4338ca; }
+
+    .form-group {
+      margin-bottom: 1.25rem !important;
+    }
+
+    .form-group label {
+      display: block !important;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      color: #374151 !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    .form-control {
+      width: 100% !important;
+      padding: 0.8rem 1rem !important;
+      border: 1px solid #d1d5db !important;
+      border-radius: 12px !important;
+      font-family: 'Poppins', sans-serif !important;
+      font-size: 0.9rem !important;
+      background-color: #f9fafb !important;
+      box-sizing: border-box !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .form-control:focus {
+      outline: none !important;
+      border-color: #4f46e5 !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+    }
+
+    textarea.form-control {
+      min-height: 110px !important;
+      resize: vertical !important;
+    }
+
+    .btn-primary {
+      width: 100% !important;
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+      color: white !important;
+      border: none !important;
+      padding: 0.9rem !important;
+      border-radius: 12px !important;
+      font-family: 'Poppins', sans-serif !important;
+      font-weight: 600 !important;
+      font-size: 0.95rem !important;
+      cursor: pointer !important;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 6px 15px rgba(79, 70, 229, 0.35) !important;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6 !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
   </style>
 </head>
 <body>
 
 <div class="app-layout">
-  <header>
+
+  <header class="app-header">
     <h1>Panel del Profesor</h1>
-    <a href="index.html" class="btn-back">🚪 Salir</a>
+    <a href="index.html" class="back-link">🚪 Salir</a>
   </header>
 
-  <form id="postForm">
-    <div class="form-group">
-      <label for="subjectSelect">Materia</label>
-      <select id="subjectSelect">
-        <option value="Generales">📢 Avisos Generales</option>
-        <option value="Matemáticas">📐 Matemáticas</option>
-        <option value="Lengua Española">📚 Lengua Española</option>
-        <option value="Ciencias Sociales">🌍 Ciencias Sociales</option>
-        <option value="Ciencias Naturales">🌱 Ciencias Naturales</option>
-        <option value="Cívica">⚖️ Cívica</option>
-        <option value="Informática">💻 Informática</option>
-        <option value="Artística">🎨 Artística</option>
-        <option value="Inglés">🗣️ Inglés</option>
-        <option value="Francés">🥖 Francés</option>
-      </select>
-    </div>
+  <main class="content-area">
+    <div class="card">
+      <form id="postForm">
+        
+        <div class="form-group">
+          <label for="subjectSelect">📍 Materia</label>
+          <select id="subjectSelect" class="form-control">
+            <option value="Generales">📢 Avisos Generales</option>
+            <option value="Matemáticas">📐 Matemáticas</option>
+            <option value="Lengua Española">📚 Lengua Española</option>
+            <option value="Ciencias Sociales">🌍 Ciencias Sociales</option>
+            <option value="Ciencias Naturales">🌱 Ciencias Naturales</option>
+            <option value="Cívica">⚖️ Cívica</option>
+            <option value="Informática">💻 Informática</option>
+            <option value="Artística">🎨 Artística</option>
+            <option value="Inglés">🗣️ Inglés</option>
+            <option value="Francés">🥖 Francés</option>
+          </select>
+        </div>
 
-    <div class="form-group">
-      <label for="pointsSelect">Recompensa en Puntos (⭐)</label>
-      <select id="pointsSelect">
-        <option value="0">Sin puntos (Solo anuncio)</option>
-        <option value="5">⭐ +5 Pts</option>
-        <option value="10">⭐ +10 Pts</option>
-        <option value="15">⭐ +15 Pts</option>
-        <option value="20">⭐ +20 Pts</option>
-        <option value="25">⭐ +25 Pts</option>
-        <option value="50">⭐ +50 Pts</option>
-      </select>
-    </div>
+        <div class="form-group">
+          <label for="pointsSelect">⭐ Recompensa en Puntos</label>
+          <select id="pointsSelect" class="form-control">
+            <option value="0">Sin puntos (Solo anuncio)</option>
+            <option value="5">⭐ +5 Pts</option>
+            <option value="10">⭐ +10 Pts</option>
+            <option value="15">⭐ +15 Pts</option>
+            <option value="20">⭐ +20 Pts</option>
+            <option value="25">⭐ +25 Pts</option>
+            <option value="50">⭐ +50 Pts</option>
+          </select>
+        </div>
 
-    <div class="form-group">
-      <label for="postText">Indicaciones de la tarea o anuncio</label>
-      <textarea id="postText" placeholder="Escribe las instrucciones aquí..." required></textarea>
-    </div>
+        <div class="form-group">
+          <label for="postText">✏️ Indicaciones de la tarea o anuncio</label>
+          <textarea id="postText" class="form-control" placeholder="Escribe las instrucciones aquí..." required></textarea>
+        </div>
 
-    <div class="form-group">
-      <label for="postFileUrl">Enlace de Imagen/Adjunto (Opcional)</label>
-      <input type="text" id="postFileUrl" placeholder="https://ejemplo.com/archivo.png"/>
-    </div>
+        <div class="form-group">
+          <label for="postFileUrl">🔗 Enlace de Imagen/Adjunto (Opcional)</label>
+          <input type="text" id="postFileUrl" class="form-control" placeholder="https://ejemplo.com/archivo.png"/>
+        </div>
 
-    <button type="submit" class="btn-submit" id="publishBtn">🚀 Publicar Tarea</button>
-  </form>
+        <button type="submit" class="btn-primary" id="publishBtn">🚀 Publicar Tarea</button>
+      </form>
+    </div>
+  </main>
+
 </div>
 
 <script type="module">
