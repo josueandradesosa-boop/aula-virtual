@@ -4,6 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profesor – Aula Virtual Premium</title>
+
+  <!-- 🔒 SISTEMA DE SEGURIDAD / CONTRASEÑA -->
+  <script>
+    // Cambia "1234" por la contraseña que tú quieras usar:
+    const CLAVE_CORRECTA = "josue1226..";
+
+    if (sessionStorage.getItem("profesorAcceso") !== "true") {
+      const claveIngresada = prompt("🔒 Área restringida. Ingresa la contraseña de profesor:");
+      
+      if (claveIngresada === CLAVE_CORRECTA) {
+        sessionStorage.setItem("profesorAcceso", "true");
+      } else {
+        alert("❌ Contraseña incorrecta. Acceso denegado.");
+        window.location.href = "index.html"; // Expulsa al usuario
+      }
+    }
+  </script>
+
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -18,9 +36,9 @@
     }
 
     .app-layout {
-      max-width: 600px !important;
+      max-width: 650px !important;
       margin: 0 auto !important;
-      background: #f9fafb !important;
+      background: #ffffff !important;
       min-height: 100vh !important;
       box-shadow: 0 0 40px rgba(0,0,0,0.05) !important;
       position: relative !important;
@@ -50,7 +68,12 @@
       cursor: pointer !important;
     }
     
-    .app-header h1 { font-size: 1.1rem !important; font-weight: 700 !important; margin: 0 !important; color: #111827 !important; }
+    .app-header h1 { 
+      font-size: 1.1rem !important; 
+      font-weight: 700 !important; 
+      margin: 0 !important; 
+      color: #111827 !important; 
+    }
 
     .content-area {
       padding: 1.5rem !important;
@@ -134,7 +157,8 @@
 
   <header class="app-header">
     <h1>Panel del Profesor</h1>
-    <a href="index.html" class="back-link">🚪 Salir</a>
+    <!-- El onclick limpia la clave al dar clic en Salir -->
+    <a href="index.html" class="back-link" onclick="sessionStorage.removeItem('profesorAcceso');">🚪 Salir</a>
   </header>
 
   <main class="content-area">
